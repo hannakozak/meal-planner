@@ -1,23 +1,58 @@
 import { montserrat, lato } from '@/app/ui/fonts'
+import Image from 'next/image'
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col p-6">
-      <h1
-        className={`${montserrat.className} text-4xl font-bold text-gray-800 md:text-3xl md:leading-normal`}
-      >
-        Mealory
-      </h1>
-      <h2 className={`${montserrat.className} text-2xl font-bold`}>
-        Organise your meals, your way <br />
-        Discover, save, and share delicious recipes!
-      </h2>
-      <p className="mt-4 text-lg text-gray-700">
-        <span className={lato.className}>
-          Join our community of cooking enthusiasts — find recipes, save your
-          favorites, and share them with others!
-        </span>
-      </p>
+      <section className="mb-16">
+        <div className="mx-auto max-w-6xl px-6 py-12  md:px-12 lg:px-20">
+          <div className="flex flex-col items-center justify-between gap-12 md:flex-row">
+            <aside className="max-w-xl">
+              <h1
+                className={`${montserrat.className} text-4xl font-extrabold text-gray-900 md:text-5xl`}
+              >
+                Mealory
+              </h1>
+
+              <h2
+                className={`${montserrat.className} mt-4 text-2xl font-semibold text-gray-800 md:text-3xl`}
+              >
+                Organise your meals, your way
+                <br />
+                <span className="text-gray-600">
+                  Discover, save, and share delicious recipes!
+                </span>
+              </h2>
+
+              <p className="mt-6 text-lg text-gray-600">
+                <span className={lato.className}>
+                  Join our community of cooking enthusiasts — find recipes, save
+                  your favorites, and share them with others.
+                </span>
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-4">
+                <button className="rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800">
+                  Add Recipe
+                </button>
+
+                <button className="rounded-xl border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-100">
+                  View Recipes
+                </button>
+              </div>
+            </aside>
+
+            <Image
+              src="/meal-bowl.png"
+              width={340}
+              height={340}
+              priority
+              alt="Meal bowl illustration"
+              className="w-full max-w-sm rounded-2xl object-contain"
+            />
+          </div>
+        </div>
+      </section>
     </main>
   )
 }
