@@ -11,7 +11,7 @@ export default function Home() {
               <h1
                 className={`${montserrat.className} text-4xl font-extrabold text-gray-900 md:text-5xl`}
               >
-                Mealory
+                Meal Planner
               </h1>
 
               <h2
