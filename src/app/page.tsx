@@ -1,4 +1,5 @@
-import { montserrat, lato } from '@/app/ui/fonts'
+import { Button } from '@/src/app/ui/Button'
+import { montserrat, lato } from '@/src/app/ui/fonts'
 import Image from 'next/image'
 
 export default function Home() {
@@ -32,13 +33,8 @@ export default function Home() {
               </p>
 
               <div className="mt-8 flex flex-wrap gap-4">
-                <button className="rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800">
-                  Add Recipe
-                </button>
-
-                <button className="rounded-xl border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-100">
-                  View Recipes
-                </button>
+                <Button variant="primary">Add Recipe</Button>
+                <Button variant="secondary">Browse Recipes</Button>
               </div>
             </aside>
 
