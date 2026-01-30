@@ -1,14 +1,16 @@
 import { PrismaClient, Role, MealType, WeekDay } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import 'dotenv/config'
 
-const prisma = new PrismaClient()
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL,
+})
+
+const prisma = new PrismaClient({
+  adapter,
+})
 
 async function main() {
-  console.log('🌱 Seeding database...')
-
-  // ======================
-  // USERS
-  // ======================
-
   const user = await prisma.user.create({
     data: {
       name: 'Jola',
@@ -24,10 +26,6 @@ async function main() {
       role: Role.ADMIN,
     },
   })
-
-  // ======================
-  // INGREDIENTS
-  // ======================
 
   const ingredients = await prisma.ingredient.createMany({
     data: [
@@ -54,10 +52,6 @@ async function main() {
   })
   const rice = await prisma.ingredient.findUnique({ where: { name: 'Rice' } })
 
-  // ======================
-  // CATEGORIES
-  // ======================
-
   const breakfastCategory = await prisma.category.create({
     data: { name: 'Breakfast' },
   })
@@ -65,10 +59,6 @@ async function main() {
   const dinnerCategory = await prisma.category.create({
     data: { name: 'Dinner' },
   })
-
-  // ======================
-  // RECIPES
-  // ======================
 
   const pancakes = await prisma.recipe.create({
     data: {
@@ -119,20 +109,12 @@ async function main() {
     },
   })
 
-  // ======================
-  // FAVORITES
-  // ======================
-
   await prisma.favorite.create({
     data: {
       userId: user.id,
       recipeId: pancakes.id,
     },
   })
-
-  // ======================
-  // MEAL PLAN
-  // ======================
 
   const mealPlan = await prisma.mealPlan.create({
     data: {
@@ -158,10 +140,6 @@ async function main() {
       },
     ],
   })
-
-  // ======================
-  // SHOPPING LIST
-  // ======================
 
   const shoppingList = await prisma.shoppingList.create({
     data: {
