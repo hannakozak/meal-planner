@@ -34,18 +34,23 @@ enum Role {
   ADMIN
 }
 
-model User {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String @default("New User")
-  email     String   @unique(map: "user_email_idx")
-  emailVerified DateTime? @db.Timestamp(6)
-  image     String?
-  password  String?
-  role      Role   @default(USER)
+enum Locale {
+  EN
+  PL
+}
 
-  recipes   Recipe[]
-  favorites Favorite[]
-  mealPlans MealPlan[]
+model User {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String    @default("New User")
+  email         String    @unique(map: "user_email_idx")
+  emailVerified DateTime? @db.Timestamp(6)
+  image         String?
+  password      String?
+  role          Role      @default(USER)
+
+  recipes       Recipe[]
+  favorites     Favorite[]
+  mealPlans     MealPlan[]
   shoppingLists ShoppingList[]
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
@@ -53,72 +58,117 @@ model User {
 }
 
 model Recipe {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title       String
-  description String?
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title        String
+  description  String?
   instructions String[]
-  imageUrl   String?
-  cookingTime Int?
-  servings    Int?
-  
-  author      User     @relation(fields: [authorId], references: [id])
-  authorId    String   @db.Uuid
+  imageUrl     String?
+  cookingTime  Int?
+  servings     Int?
 
-  ingredients RecipeIngredient[]
-  categories  RecipeCategory[]
-  favorites   Favorite[]
-  mealPlans   MealPlanRecipe[]
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String @db.Uuid
+
+  ingredients   RecipeIngredient[]
+  categories    RecipeCategory[]
+  favorites     Favorite[]
+  mealPlans     MealPlanRecipe[]
   shoppingLists ShoppingList[]
 
-  createdAt   DateTime @default(now()) @db.Timestamp(6)
-  updatedAt   DateTime @updatedAt @db.Timestamp(6)
+  translations RecipeTranslation[]
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
 
   @@index([authorId])
 }
 
+model RecipeTranslation {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  locale Locale
+
+  title        String
+  description  String?
+  instructions String[]
+
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipeId String @db.Uuid
+
+  @@unique([recipeId, locale])
+}
+
 model Ingredient {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String   @unique(map: "ingredient_name_idx")
-  unit      String?
+  id   String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String  @unique(map: "ingredient_name_idx")
+  unit String?
 
   caloriesPerUnit Float?
   proteinPerUnit  Float?
   carbsPerUnit    Float?
   fatsPerUnit     Float?
 
-  recipes RecipeIngredient[]
+  recipes           RecipeIngredient[]
+  shoppingListItems ShoppingListItem[]
+  translations      IngredientTranslation[]
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
 }
 
+model IngredientTranslation {
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locale Locale
+  name   String
+
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  ingredientId String     @db.Uuid
+
+  @@unique([ingredientId, locale])
+}
+
 model RecipeIngredient {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  quantity    Float?
-  note String?
+  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  quantity Float?
+  note     String?
 
-  recipe      Recipe   @relation(fields: [recipeId], references: [id])
-  recipeId    String   @db.Uuid
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipeId String @db.Uuid
 
-  ingredient  Ingredient @relation(fields: [ingredientId], references: [id])
-  ingredientId String   @db.Uuid
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  ingredientId String     @db.Uuid
 
   @@unique([recipeId, ingredientId])
 }
 
 model Category {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String   @unique(map: "category_name_idx")
-  locale String?
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique(map: "category_name_idx")
 
-  recipes   RecipeCategory[]
+  recipes RecipeCategory[]
+
+  translations CategoryTranslation[]
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @db.Timestamp(6)
+}
+
+model CategoryTranslation {
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locale Locale
+  name   String
+
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String   @db.Uuid
+
+  @@unique([categoryId, locale])
 }
 
 model RecipeCategory {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  recipe     Recipe   @relation(fields: [recipeId], references: [id])
-  recipeId   String   @db.Uuid
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipeId String @db.Uuid
 
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String   @db.Uuid
@@ -127,13 +177,13 @@ model RecipeCategory {
 }
 
 model Favorite {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
 
-  recipe    Recipe   @relation(fields: [recipeId], references: [id])
-  recipeId  String   @db.Uuid
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipeId String @db.Uuid
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
 
@@ -141,14 +191,15 @@ model Favorite {
 }
 
 model MealPlan {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.Uuid
- 
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
+
   weekStart DateTime @db.Date
   weekEnd   DateTime @db.Date
 
-  meals    MealPlanRecipe[]
+  meals        MealPlanRecipe[]
+  translations MealPlanTranslation[]
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
@@ -156,18 +207,29 @@ model MealPlan {
   @@index([userId])
 }
 
+model MealPlanTranslation {
+  id     String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locale Locale
+  name   String?
+
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  mealPlanId String   @db.Uuid
+
+  @@unique([mealPlanId, locale])
+}
+
 model MealPlanRecipe {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id    String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   notes String?
 
   mealPlan   MealPlan @relation(fields: [mealPlanId], references: [id])
   mealPlanId String   @db.Uuid
 
-  recipe     Recipe   @relation(fields: [recipeId], references: [id])
-  recipeId   String   @db.Uuid
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+  recipeId String @db.Uuid
 
-  day  WeekDay?
-  mealType   MealType
+  day      WeekDay?
+  mealType MealType
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
@@ -177,32 +239,60 @@ model MealPlanRecipe {
 }
 
 model ShoppingList {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.Uuid
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
 
-  title    String
-  items     ShoppingListItem[]
-  recipe     Recipe? @relation(fields: [recipeId], references: [id])
-  recipeId   String? @db.Uuid
+  title        String
+  items        ShoppingListItem[]
+  recipe       Recipe?                   @relation(fields: [recipeId], references: [id])
+  recipeId     String?                   @db.Uuid
+  translations ShoppingListTranslation[]
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
 
   @@index([userId])
-} 
+}
+
+model ShoppingListTranslation {
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locale Locale
+  title  String
+
+  shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
+  shoppingListId String       @db.Uuid
+
+  @@unique([shoppingListId, locale])
+}
 
 model ShoppingListItem {
-  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name            String
-  quantity        Float?
-  unit            String?
-  isPurchased     Boolean @default(false)
-  section         String?
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  quantity    Float?
+  unit        String?
+  isPurchased Boolean @default(false)
+  section     String?
 
-  shoppingList    ShoppingList @relation(fields: [shoppingListId], references: [id])
-  shoppingListId  String   @db.Uuid
+  shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id])
+  shoppingListId String       @db.Uuid
 
-  createdAt       DateTime @default(now()) @db.Timestamp(6)
-  updatedAt       DateTime @updatedAt @db.Timestamp(6)
+  ingredientId String? @db.Uuid
+  ingredient Ingredient? @relation(fields: [ingredientId], references: [id])
+
+  translations ShoppingListItemTranslation[]
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model ShoppingListItemTranslation {
+  id      String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  locale  Locale
+  section String?
+
+  shoppingListItem   ShoppingListItem @relation(fields: [shoppingListItemId], references: [id], onDelete: Cascade)
+  shoppingListItemId String           @db.Uuid
+
+  @@unique([shoppingListItemId, locale])
 }
