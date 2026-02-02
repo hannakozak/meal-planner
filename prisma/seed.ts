@@ -1,6 +1,8 @@
 import { PrismaClient, Role, MealType, WeekDay } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { sampleData } from './sample-data'
 import 'dotenv/config'
+import { use } from 'react'
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -11,22 +13,22 @@ const prisma = new PrismaClient({
 })
 
 async function main() {
-  const user = await prisma.user.create({
-    data: {
-      name: 'Jola',
-      email: 'jola@example.com',
-      role: Role.USER,
-    },
-  })
+  await prisma.recipeCategory.deleteMany()
+  await prisma.recipeIngredient.deleteMany()
+  await prisma.mealPlanRecipe.deleteMany()
+  await prisma.shoppingListItem.deleteMany()
 
-  const admin = await prisma.user.create({
-    data: {
-      name: 'Admin',
-      email: 'admin@example.com',
-      role: Role.ADMIN,
-    },
-  })
+  await prisma.favorite.deleteMany()
+  await prisma.shoppingList.deleteMany()
+  await prisma.mealPlan.deleteMany()
 
+  await prisma.recipe.deleteMany()
+  await prisma.ingredient.deleteMany()
+  await prisma.category.deleteMany()
+
+  await prisma.user.deleteMany()
+
+  await prisma.user.createMany({ data: sampleData.users })
   const ingredients = await prisma.ingredient.createMany({
     data: [
       { name: 'Egg', unit: 'piece', caloriesPerUnit: 70, proteinPerUnit: 6 },
@@ -71,8 +73,7 @@ async function main() {
       ],
       cookingTime: 20,
       servings: 2,
-      authorId: user.id,
-
+      authorId: sampleData.users[0].id,
       ingredients: {
         create: [
           { ingredientId: egg!.id, quantity: 2 },
@@ -94,7 +95,7 @@ async function main() {
       instructions: ['Cook rice.', 'Grill chicken.', 'Serve together.'],
       cookingTime: 30,
       servings: 3,
-      authorId: user.id,
+      authorId: sampleData.users[1].id,
 
       ingredients: {
         create: [
@@ -111,14 +112,14 @@ async function main() {
 
   await prisma.favorite.create({
     data: {
-      userId: user.id,
+      userId: sampleData.users[1].id,
       recipeId: pancakes.id,
     },
   })
 
   const mealPlan = await prisma.mealPlan.create({
     data: {
-      userId: user.id,
+      userId: sampleData.users[1].id,
       weekStart: new Date('2026-02-02'),
       weekEnd: new Date('2026-02-08'),
     },
@@ -143,7 +144,7 @@ async function main() {
 
   const shoppingList = await prisma.shoppingList.create({
     data: {
-      userId: user.id,
+      userId: sampleData.users[1].id,
       title: 'Weekly groceries',
       recipeId: chickenRice.id,
     },
