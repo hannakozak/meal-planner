@@ -16,8 +16,8 @@ export function SignUpForm() {
 
   return (
     <CardContent>
-      <form onSubmit={handleSubmit} className="space-y-7">
-        <div className="space-y-2">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1">
           <Label htmlFor="name" className="text-sm font-medium">
             Full Name
           </Label>
@@ -92,11 +92,10 @@ export function SignUpForm() {
           Sign Up
         </Button>
 
-        {/* Redirect */}
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{' '}
           <Link
-            href="/sign-in"
+            href="/auth/signin"
             className="text-primary font-semibold hover:text-primary/80 transition-colors"
           >
             Sign In

@@ -40,7 +40,7 @@ export function SignInForm() {
               Password
             </Label>
             <Link
-              href="/forgot-password"
+              href="/auth/forgot-password"
               className="text-xs text-primary hover:text-primary/80 font-medium transition-colors"
             >
               Forgot password?
@@ -82,7 +82,7 @@ export function SignInForm() {
         <p className="text-center text-sm text-muted-foreground">
           Don’t have an account?{' '}
           <Link
-            href="/sign-up"
+            href="/auth/signup"
             className="text-primary font-semibold hover:text-primary/80 transition-colors"
           >
             Sign Up

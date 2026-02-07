@@ -1,5 +1,5 @@
-import { Button } from '@/src/app/ui/Button'
-import { montserrat, lato } from '@/src/app/ui/fonts'
+import { Button } from '@/components/ui/button'
+import { montserrat, lato } from '@/styles/fonts'
 import Image from 'next/image'
 
 export default function Home() {
@@ -33,8 +33,8 @@ export default function Home() {
               </p>
 
               <div className="mt-8 flex flex-wrap gap-4">
-                <Button variant="primary">Add Recipe</Button>
-                <Button variant="secondary">Browse Recipes</Button>
+                <Button variant="default">Add Recipe</Button>
+                <Button variant="default">Browse Recipes</Button>
               </div>
             </aside>
 
