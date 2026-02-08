@@ -7,16 +7,33 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { CardContent } from '@/components/ui/card'
+import { signInDefaultValues } from '@/constants'
+import { useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
+import { signInWithCredentials } from '@/lib/actions/user.actions'
 
 export function SignInForm() {
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Formularz wysłany')
+  const [data, action] = useActionState(signInWithCredentials, {
+    success: false,
+    message: '',
+  })
+
+  const SignInButton = () => {
+    const { pending } = useFormStatus()
+
+    return (
+      <Button
+        disabled={pending}
+        className="w-full h-11 rounded-lg bg-primary hover:bg-primary/90 transition-colors shadow-sm hover:shadow-md variant='default' "
+      >
+        {pending ? 'Signing In...' : 'Sign In'}
+      </Button>
+    )
   }
 
   return (
     <CardContent>
-      <form onSubmit={handleSubmit} className="space-y-7">
+      <form action={action} className="space-y-7">
         <div className="space-y-2">
           <Label htmlFor="email" className="text-sm font-medium">
             Email
@@ -25,11 +42,13 @@ export function SignInForm() {
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/80 pointer-events-none" />
             <Input
               id="email"
+              name="email"
               type="email"
               autoComplete="email"
               placeholder="Enter your email"
               className="pl-10 h-11 rounded-lg focus-visible:ring-2 focus-visible:ring-primary transition-colors"
               required
+              defaultValue={signInDefaultValues.email}
             />
           </div>
         </div>
@@ -51,10 +70,12 @@ export function SignInForm() {
             <Input
               id="password"
               type="password"
+              name="password"
               placeholder="Enter your password"
               className="pl-10 h-11 rounded-lg focus-visible:ring-2 focus-visible:ring-primary transition-colors"
               autoComplete="current-password"
               required
+              defaultValue={signInDefaultValues.password}
             />
           </div>
         </div>
@@ -71,14 +92,10 @@ export function SignInForm() {
             Remember me
           </Label>
         </div>
-
-        <Button
-          type="submit"
-          className="w-full h-11 rounded-lg bg-primary hover:bg-primary/90 transition-colors shadow-sm hover:shadow-md"
-        >
-          Sign In
-        </Button>
-
+        <SignInButton />
+        {data && !data.success && (
+          <div className="text-center text-destructive">{data.message}</div>
+        )}
         <p className="text-center text-sm text-muted-foreground">
           Don’t have an account?{' '}
           <Link

@@ -7,13 +7,20 @@ import {
   CardDescription,
 } from '@/components/ui/card'
 import { SignInForm } from '@/features/auth/sign-in-form'
+import { auth } from '../../../../auth'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: 'Sign In | Meal Planner',
   description: 'Log in to manage your daily meal plans.',
 }
 
-export default function SignInPage() {
+const SignInPage = async () => {
+  const session = await auth()
+  if (session) {
+    return redirect('/')
+  }
+
   return (
     <Card className="w-full max-w-[95%] sm:max-w-[420px] rounded-xl shadow-md border-0">
       <CardHeader className="text-center space-y-2 pb-6">
@@ -36,3 +43,5 @@ export default function SignInPage() {
     </Card>
   )
 }
+
+export default SignInPage
