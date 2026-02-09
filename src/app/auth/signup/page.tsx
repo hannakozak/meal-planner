@@ -3,9 +3,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { SignInForm } from '@/features/auth/sign-in-form'
-import { SignUpForm } from '@/features/auth/sign-up-form'
+} from '@src/components/ui/card'
+import { SignInForm } from '@src/features/auth/sign-in-form'
+import { SignUpForm } from '@src/features/auth/sign-up-form'
 import { Leaf } from 'lucide-react'
 import { Metadata } from 'next'
 

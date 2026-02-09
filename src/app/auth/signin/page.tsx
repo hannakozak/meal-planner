@@ -5,9 +5,9 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from '@/components/ui/card'
-import { SignInForm } from '@/features/auth/sign-in-form'
-import { auth } from '../../../../auth'
+} from '@src/components/ui/card'
+import { SignInForm } from '@src/features/auth/sign-in-form'
+import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {

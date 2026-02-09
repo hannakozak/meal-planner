@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { Mail, Lock, User } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import { CardContent } from '@/components/ui/card'
+import { Button } from '@src/components/ui/button'
+import { Input } from '@src/components/ui/input'
+import { Label } from '@src/components/ui/label'
+import { Checkbox } from '@src/components/ui/checkbox'
+import { CardContent } from '@src/components/ui/card'
 
 export function SignUpForm() {
   const handleSubmit = async (e: React.FormEvent) => {

@@ -1,5 +1,5 @@
 'use server'
-import { signInSchema } from '@/lib/validators'
+import { signInSchema } from '@src/lib/validators'
 import { signIn, signOut } from '../../../auth'
 
 export async function signInWithCredentials(
