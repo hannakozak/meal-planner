@@ -4,6 +4,8 @@ import { signIn, signOut } from '../../../auth'
 import { hashSync } from 'bcrypt-ts-edge'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { isRedirectError } from 'next/dist/client/components/redirect-error'
+import { formatError } from '@/src/lib/utils'
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -12,6 +14,25 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({
   adapter,
 })
+
+export async function signInWithCredentials(
+  prevState: unknown,
+  formData: FormData,
+) {
+  try {
+    const user = signInSchema.parse({
+      email: formData.get('email'),
+      password: formData.get('password'),
+    })
+    await signIn('credentials', user)
+    return { success: true, message: 'Signed in successfully' }
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error
+    }
+    return { success: false, message: 'Invalid email or password' }
+  }
+}
 
 export async function signUpUser(prevState: unknown, formData: FormData) {
   try {
@@ -40,25 +61,10 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 
     return { success: true, message: 'User created and signed in successfully' }
   } catch (error) {
-    console.log('validation error', error)
-    return { success: false, message: 'User creation failed' }
-  }
-}
-
-export async function signInWithCredentials(
-  prevState: unknown,
-  formData: FormData,
-) {
-  try {
-    const user = signInSchema.parse({
-      email: formData.get('email'),
-      password: formData.get('password'),
-    })
-    await signIn('credentials', user)
-    return { success: true, message: 'Signed in successfully' }
-  } catch (error) {
-    console.log('validation error', error)
-    return { success: false, message: 'Invalid email or password' }
+    if (isRedirectError(error)) {
+      throw error
+    }
+    return { success: false, message: formatError(error) }
   }
 }
 

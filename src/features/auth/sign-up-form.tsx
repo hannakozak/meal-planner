@@ -112,6 +112,9 @@ export function SignUpForm() {
         </div>
 
         <SignUpButton />
+        {data && !data.success && (
+          <div className="text-center text-destructive">{data.message}</div>
+        )}
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{' '}
