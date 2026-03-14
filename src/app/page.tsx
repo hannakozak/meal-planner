@@ -1,15 +1,10 @@
 import { Button } from '@src/components/ui/button'
 import { montserrat, lato } from '@src/styles/fonts'
 import Image from 'next/image'
-import { UserButton } from '@src/features/auth/user-button'
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col p-6">
-      <div className="flex justify-end">
-        <UserButton />
-      </div>
-
       <section className="mb-16">
         <div className="mx-auto max-w-6xl px-6 py-12  md:px-12 lg:px-20">
           <div className="flex flex-col items-center justify-between gap-12 md:flex-row">
