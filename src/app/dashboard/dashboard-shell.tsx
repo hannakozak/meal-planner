@@ -53,10 +53,12 @@ export function DashboardShell({ children, userName }: Props) {
         `}
       >
         <div className="h-16 flex items-center justify-between px-6 border-b">
-          <div className="flex items-center gap-2">
-            <Leaf className="h-6 w-6 text-primary" />
-            <span className="font-semibold text-lg">Meal Planner</span>
-          </div>
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <Leaf className="h-6 w-6 text-primary" />
+              <span className="font-semibold text-lg">Meal Planner</span>
+            </div>
+          </Link>
 
           <button className="lg:hidden" onClick={() => setOpen(false)}>
             <X size={20} />
