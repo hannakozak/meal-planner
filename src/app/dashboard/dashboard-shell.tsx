@@ -15,6 +15,7 @@ import {
   Menu,
 } from 'lucide-react'
 import { signOutUser } from '@/src/lib/actions/user.actions'
+import { LogoutButton } from '@/src/features/auth/logout-button'
 
 type Props = {
   children: ReactNode
@@ -97,14 +98,7 @@ export function DashboardShell({ children, userName }: Props) {
             Welcome{userName ? `, ${userName}` : ''}
           </div>
           <div className="ml-auto flex items-center gap-3">
-            <form action={signOutUser}>
-              <button
-                type="submit"
-                className="p-2 rounded-md hover:bg-gray-100 transition"
-              >
-                <LogOut size={18} />
-              </button>
-            </form>
+            <LogoutButton />
           </div>
         </header>
 
