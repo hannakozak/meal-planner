@@ -1,4 +1,5 @@
 import { auth } from '@/auth'
+import { Logo } from '@/src/components/ui/logo'
 import {
   Card,
   CardDescription,
@@ -28,13 +29,8 @@ const SignUpPage = async (props: {
   return (
     <Card className="w-full max-w-[95%] sm:max-w-[420px] rounded-xl shadow-md border-0">
       <CardHeader className="text-center space-y-2 pb-6">
-        <div className="flex justify-center items-center gap-2 mb-2">
-          <div>
-            <Leaf className="h-8 w-8 text-primary" strokeWidth={2.5} />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-foreground">
-            Meal Planner
-          </span>
+        <div className="flex justify-center">
+          <Logo />
         </div>
         <CardTitle className="text-2xl font-bold text-foreground">
           Create Your Account

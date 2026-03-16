@@ -4,25 +4,23 @@ import { ReactNode, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Leaf,
   LayoutDashboard,
   BookOpen,
   CalendarDays,
   ShoppingCart,
   Settings,
-  LogOut,
   X,
   Menu,
 } from 'lucide-react'
-import { signOutUser } from '@/src/lib/actions/user.actions'
 import { LogoutButton } from '@/src/features/auth/logout-button'
+import { Logo } from '@/src/components/ui/logo'
 
-type Props = {
+type DashboardShellProps = {
   children: ReactNode
   userName?: string
 }
 
-export function DashboardShell({ children, userName }: Props) {
+export function DashboardShell({ children, userName }: DashboardShellProps) {
   const [open, setOpen] = useState(false)
 
   const pathname = usePathname()
@@ -54,13 +52,7 @@ export function DashboardShell({ children, userName }: Props) {
         `}
       >
         <div className="h-16 flex items-center justify-between px-6 border-b">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex items-center gap-2">
-              <Leaf className="h-6 w-6 text-primary" />
-              <span className="font-semibold text-lg">Meal Planner</span>
-            </div>
-          </Link>
-
+          <Logo />
           <button className="lg:hidden" onClick={() => setOpen(false)}>
             <X size={20} />
           </button>
