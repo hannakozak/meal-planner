@@ -1,5 +1,4 @@
 import { Metadata } from 'next'
-import { Leaf } from 'lucide-react'
 import {
   Card,
   CardHeader,
