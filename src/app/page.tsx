@@ -3,6 +3,7 @@ import { UserButton } from '@/src/features/auth/user-button'
 import { Button } from '@src/components/ui/button'
 import { montserrat, lato } from '@src/styles/fonts'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -41,7 +42,9 @@ export default function Home() {
 
               <div className="mt-8 flex flex-wrap gap-4">
                 <Button variant="default">Add Recipe</Button>
-                <Button variant="default">Browse Recipes</Button>
+                <Link href="/recipes">
+                  <Button variant="default">Browse Recipes</Button>
+                </Link>
               </div>
             </aside>
 
