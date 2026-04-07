@@ -1,4 +1,5 @@
 import { prisma } from '@/src/lib/prisma'
+import Link from 'next/link'
 
 export default async function RecipesPage() {
   const recipes = await prisma.recipe.findMany({
@@ -13,20 +14,20 @@ export default async function RecipesPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {recipes.map((recipe) => (
-          <div
+          <Link
             key={recipe.id}
-            className="p-6 bg-white border rounded-xl shadow-sm"
+            href={`/recipes/${recipe.id}`}
+            className="block p-6 bg-white border rounded-xl shadow-sm hover:shadow-md transition"
           >
             <h2 className="text-lg font-semibold">{recipe.title}</h2>
 
             {recipe.description && (
               <p className="text-sm text-gray-500 mt-2">{recipe.description}</p>
             )}
-
             <div className="mt-4 text-sm text-gray-400">
               {recipe.cookingTime && <span>⏱ {recipe.cookingTime} min</span>}
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
