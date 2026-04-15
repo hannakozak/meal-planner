@@ -120,8 +120,18 @@ export default async function DashboardPage() {
                   className="group flex items-center justify-between p-4 bg-white border rounded-xl hover:border-primary/30 hover:bg-primary/5 transition-all"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                      <BookOpen size={20} />
+                    <div
+                      className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{
+                        background: `hsl(${recipe.title.charCodeAt(0) * 5}, 60%, 90%)`,
+                      }}
+                    >
+                      <BookOpen
+                        size={20}
+                        style={{
+                          color: `hsl(${recipe.title.charCodeAt(0) * 5}, 60%, 40%)`,
+                        }}
+                      />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">
