@@ -86,10 +86,10 @@ export function DashboardShell({ children, userName }: DashboardShellProps) {
           >
             <Menu size={20} />
           </button>
-          <div className="font-medium text-gray-700">
-            Welcome{userName ? `, ${userName}` : ''}
-          </div>
           <div className="ml-auto flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-semibold">
+              {userName?.charAt(0).toUpperCase()}
+            </div>
             <LogoutButton />
           </div>
         </header>
