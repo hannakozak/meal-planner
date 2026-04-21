@@ -1,5 +1,8 @@
 import { prisma } from '@/src/lib/prisma'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import { deleteRecipe } from '@/src/lib/actions/recipe.actions'
+import { DeleteRecipeButton } from '@/src/components/ui/deleteRecipeButton'
 
 export default async function RecipePage({
   params,
@@ -24,6 +27,15 @@ export default async function RecipePage({
             {recipe.description}
           </p>
         )}
+      </div>
+      <div className="flex gap-3 pt-2">
+        <Link
+          href={`/recipes/${recipe.id}/edit`}
+          className="px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 transition"
+        >
+          Edit
+        </Link>
+        <DeleteRecipeButton id={recipe.id} action={deleteRecipe} />
       </div>
       <div className="flex gap-6 text-sm text-gray-500">
         {recipe.cookingTime && (
