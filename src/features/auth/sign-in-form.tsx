@@ -2,15 +2,15 @@
 
 import Link from 'next/link'
 import { Mail, Lock } from 'lucide-react'
-import { Button } from '@src/components/ui/button'
-import { Input } from '@src/components/ui/input'
-import { Label } from '@src/components/ui/label'
-import { Checkbox } from '@src/components/ui/checkbox'
-import { CardContent } from '@src/components/ui/card'
-import { signInDefaultValues } from '@src/constants'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { CardContent } from '@/components/ui/card'
+import { signInDefaultValues } from '@/constants'
 import { useActionState } from 'react'
 import { useFormStatus } from 'react-dom'
-import { signInWithCredentials } from '@src/lib/actions/user.actions'
+import { signInWithCredentials } from '@/lib/actions/user.actions'
 
 export function SignInForm() {
   const [data, action] = useActionState(signInWithCredentials, {

@@ -1,11 +1,11 @@
 'use server'
-import { signInSchema, signUpSchema } from '@src/lib/validators'
-import { signIn, signOut } from '../../../auth'
+import { signInSchema, signUpSchema } from '@/lib/validators'
+import { signIn, signOut } from '../../auth'
 import { hashSync } from 'bcrypt-ts-edge'
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
-import { formatError } from '@/src/lib/utils'
+import { formatError } from '@/lib/utils'
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,

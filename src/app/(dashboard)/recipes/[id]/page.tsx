@@ -1,8 +1,8 @@
-import { prisma } from '@/src/lib/prisma'
+import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
-import { deleteRecipe } from '@/src/lib/actions/recipe.actions'
-import { DeleteRecipeButton } from '@/src/components/ui/deleteRecipeButton'
+import { deleteRecipe, updateRecipe } from '@/lib/actions/recipe.actions'
+import { DeleteRecipeButton } from '@/components/ui/deleteRecipeButton'
+import { EditRecipeDialog } from '@/components/ui/editRecipeDialog'
 
 export default async function RecipePage({
   params,
@@ -29,12 +29,10 @@ export default async function RecipePage({
         )}
       </div>
       <div className="flex gap-3 pt-2">
-        <Link
-          href={`/recipes/${recipe.id}/edit`}
-          className="px-3 py-1.5 text-sm rounded-lg border hover:bg-gray-50 transition"
-        >
-          Edit
-        </Link>
+        <EditRecipeDialog
+          recipe={recipe}
+          action={updateRecipe.bind(null, recipe.id)}
+        />
         <DeleteRecipeButton id={recipe.id} action={deleteRecipe} />
       </div>
       <div className="flex gap-6 text-sm text-gray-500">

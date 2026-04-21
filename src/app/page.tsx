@@ -1,7 +1,7 @@
-import { Logo } from '@/src/components/ui/logo'
-import { UserButton } from '@/src/features/auth/user-button'
-import { Button } from '@src/components/ui/button'
-import { montserrat, lato } from '@src/styles/fonts'
+import { Logo } from '@/components/ui/logo'
+import { UserButton } from '@/features/auth/user-button'
+import { Button } from '@/components/ui/button'
+import { montserrat, lato } from '@/styles/fonts'
 import Image from 'next/image'
 import Link from 'next/link'
 

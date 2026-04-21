@@ -12,8 +12,8 @@ import {
   X,
   Menu,
 } from 'lucide-react'
-import { LogoutButton } from '@/src/features/auth/logout-button'
-import { Logo } from '@/src/components/ui/logo'
+import { LogoutButton } from '@/features/auth/logout-button'
+import { Logo } from '@/components/ui/logo'
 
 type DashboardShellProps = {
   children: ReactNode

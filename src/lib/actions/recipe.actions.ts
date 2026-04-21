@@ -1,8 +1,8 @@
 'use server'
 
-import { prisma } from '@/src/lib/prisma'
-import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
+import { prisma } from '@/lib/prisma'
+import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function createRecipe(formData: FormData) {
@@ -41,4 +41,26 @@ export async function deleteRecipe(id: string) {
 
   revalidatePath('/recipes')
   redirect('/recipes')
+}
+
+export async function updateRecipe(id: string, formData: FormData) {
+  const title = formData.get('title') as string
+  const description = formData.get('description') as string
+  const cookingTime = formData.get('cookingTime')
+  const servings = formData.get('servings')
+
+  await prisma.recipe.update({
+    where: { id },
+    data: {
+      title,
+      description,
+      cookingTime: cookingTime ? Number(cookingTime) : null,
+      servings: servings ? Number(servings) : null,
+    },
+  })
+
+  revalidatePath('/recipes')
+  revalidatePath(`/recipes/${id}`)
+
+  redirect(`/recipes/${id}`)
 }

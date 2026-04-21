@@ -1,14 +1,14 @@
-import Link from 'next/link'
 import { auth } from '@/auth'
-import { signOutUser } from '@src/lib/actions/user.actions'
-import { Button } from '@/src/components/ui/button'
+import Link from 'next/link'
+import { signOutUser } from '@/lib/actions/user.actions'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@src/components/ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 import { UserIcon } from 'lucide-react'
 
 export const UserButton = async () => {

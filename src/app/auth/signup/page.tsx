@@ -1,12 +1,12 @@
 import { auth } from '@/auth'
-import { Logo } from '@/src/components/ui/logo'
+import { Logo } from '@/components/ui/logo'
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@src/components/ui/card'
-import { SignUpForm } from '@src/features/auth/sign-up-form'
+} from '@/components/ui/card'
+import { SignUpForm } from '@/features/auth/sign-up-form'
 import { Leaf } from 'lucide-react'
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'

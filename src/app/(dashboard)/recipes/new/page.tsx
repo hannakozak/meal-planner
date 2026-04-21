@@ -1,4 +1,4 @@
-import { createRecipe } from '@/src/lib/actions/recipe.actions'
+import { createRecipe } from '@/lib/actions/recipe.actions'
 
 export default function NewRecipePage() {
   return (

@@ -1,14 +1,14 @@
 import { Metadata } from 'next'
+import { auth } from '@/auth'
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
-} from '@src/components/ui/card'
-import { SignInForm } from '@src/features/auth/sign-in-form'
-import { auth } from '@/auth'
+} from '@/components/ui/card'
+import { SignInForm } from '@/features/auth/sign-in-form'
 import { redirect } from 'next/navigation'
-import { Logo } from '@/src/components/ui/logo'
+import { Logo } from '@/components/ui/logo'
 
 export const metadata: Metadata = {
   title: 'Sign In | Meal Planner',
