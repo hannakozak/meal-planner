@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   ChevronRight,
 } from 'lucide-react'
+import { PrimaryActionButton } from '@/components/ui/primaryActionButton'
 
 export default async function DashboardPage() {
   const [recipeCount, latestRecipes] = await Promise.all([
@@ -62,13 +63,10 @@ export default async function DashboardPage() {
             Manage your culinary world in one place.
           </p>
         </div>
-        <Link
-          href="/recipes/new"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl hover:opacity-90 transition-all font-medium shadow-sm active:scale-95"
-        >
+        <PrimaryActionButton href="/recipes/new">
           <Plus size={18} />
-          <span>New Recipe</span>
-        </Link>
+          New Recipe
+        </PrimaryActionButton>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
