@@ -1,4 +1,4 @@
-import { PrimaryActionButton } from '@/components/ui/primaryActionButton'
+import { PrimaryActionButton } from '@/components/buttons/primaryActionButton'
 import { prisma } from '@/lib/prisma'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'

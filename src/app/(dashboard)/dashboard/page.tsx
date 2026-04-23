@@ -10,7 +10,7 @@ import {
   CheckCircle2,
   ChevronRight,
 } from 'lucide-react'
-import { PrimaryActionButton } from '@/components/ui/primaryActionButton'
+import { PrimaryActionButton } from '@/components/buttons/primaryActionButton'
 
 export default async function DashboardPage() {
   const [recipeCount, latestRecipes] = await Promise.all([
