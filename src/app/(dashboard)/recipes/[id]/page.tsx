@@ -28,9 +28,9 @@ export default async function RecipePage({
           </p>
         )}
       </div>
-      <div className="flex gap-3 pt-2">
+      <div className="flex items-center gap-1">
         <EditRecipeDialog recipe={recipe} />
-        <DeleteButton action={deleteRecipe.bind(null, recipe.id)} />
+        <DeleteButton id={recipe.id} action={deleteRecipe} size="sm" />
       </div>
       <div className="flex gap-6 text-sm text-gray-500">
         {recipe.cookingTime && (

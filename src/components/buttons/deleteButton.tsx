@@ -1,24 +1,24 @@
 'use client'
 
-import { useTransition } from 'react'
 import { Trash } from 'lucide-react'
-import { ActionButton } from './actionButton'
+import { ActionButton } from '@/components/buttons/actionButton'
 
-export function DeleteButton({ action }: { action: () => Promise<void> }) {
-  const [isPending, startTransition] = useTransition()
-
+export function DeleteButton({
+  id,
+  action,
+  size = 'md',
+}: {
+  id: string
+  action: (formData: FormData) => Promise<void>
+  size?: 'sm' | 'md'
+}) {
   return (
-    <ActionButton
-      variant="danger"
-      disabled={isPending}
-      onClick={() =>
-        startTransition(async () => {
-          await action()
-        })
-      }
-    >
-      <Trash size={16} />
-      {isPending ? 'Deleting...' : 'Delete'}
-    </ActionButton>
+    <form action={action}>
+      <input type="hidden" name="id" value={id} />
+      <ActionButton variant="ghost-danger" size={size} type="submit">
+        <Trash size={size === 'sm' ? 12 : 14} />
+        Delete
+      </ActionButton>
+    </form>
   )
 }

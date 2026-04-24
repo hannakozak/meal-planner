@@ -30,8 +30,8 @@ export function EditRecipeDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <ActionButton variant="outline">
-          <Pencil size={16} />
+        <ActionButton variant="outline" size="sm">
+          <Pencil size={12} />
           Edit
         </ActionButton>
       </DialogTrigger>

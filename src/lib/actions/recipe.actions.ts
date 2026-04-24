@@ -34,13 +34,14 @@ export async function createRecipe(formData: FormData) {
   redirect('/recipes')
 }
 
-export async function deleteRecipe(id: string) {
+export async function deleteRecipe(formData: FormData) {
+  const id = formData.get('id') as string
+
   await prisma.recipe.delete({
     where: { id },
   })
 
   revalidatePath('/recipes')
-  redirect('/recipes')
 }
 
 export async function updateRecipe(id: string, formData: FormData) {

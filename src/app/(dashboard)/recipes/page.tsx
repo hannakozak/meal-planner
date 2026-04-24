@@ -1,58 +1,88 @@
-import { PrimaryActionButton } from '@/components/buttons/primaryActionButton'
 import { prisma } from '@/lib/prisma'
-import { Plus } from 'lucide-react'
 import Link from 'next/link'
+import { PrimaryActionButton } from '@/components/buttons/primaryActionButton'
+import { EditRecipeDialog } from '@/components/buttons/editRecipeDialog'
+import { DeleteButton } from '@/components/buttons/deleteButton'
+import { deleteRecipe } from '@/lib/actions/recipe.actions'
+import { Plus, Clock, ChefHat } from 'lucide-react'
 
 export default async function RecipesPage() {
   const recipes = await prisma.recipe.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
+    orderBy: { createdAt: 'desc' },
   })
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold tracking-tight">Recipes</h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            Recipes
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            {recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'} saved
+          </p>
+        </div>
         <PrimaryActionButton href="/recipes/new">
-          <Plus size={18} />
+          <Plus size={16} />
           New Recipe
         </PrimaryActionButton>
       </div>
-      {recipes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500">
-          <p className="text-lg font-medium">No recipes yet</p>
-          <p className="text-sm mb-4">Start by creating your first recipe</p>
 
+      {recipes.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
+            <ChefHat size={28} className="text-gray-400" />
+          </div>
+          <p className="text-base font-medium text-gray-700">No recipes yet</p>
+          <p className="text-sm text-gray-400 mt-1 mb-6">
+            Start by creating your first recipe
+          </p>
           <PrimaryActionButton href="/recipes/new">
-            <Plus size={18} />
+            <Plus size={16} />
             New Recipe
           </PrimaryActionButton>
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {recipes.map((recipe) => (
-            <Link
+            <div
               key={recipe.id}
-              href={`/recipes/${recipe.id}`}
-              className="group block p-6 bg-white border rounded-xl shadow-sm hover:shadow-md hover:-translate-y-1 transition cursor-pointer"
+              className="group flex flex-col bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
             >
-              <h2 className="text-lg font-semibold tracking-tight group-hover:text-black transition">
-                {recipe.title}
-              </h2>
-              {recipe.description && (
-                <p className="text-sm text-gray-500 mt-2 line-clamp-2">
-                  {recipe.description}
-                </p>
-              )}
-              <div className="mt-4 flex items-center justify-between text-sm text-gray-400">
-                {recipe.cookingTime && <span>⏱ {recipe.cookingTime} min</span>}
+              <Link href={`/recipes/${recipe.id}`} className="block p-5 flex-1">
+                <h2 className="text-base font-semibold text-gray-900 leading-snug truncate">
+                  {recipe.title}
+                </h2>
+                {recipe.description && (
+                  <p className="text-sm text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">
+                    {recipe.description}
+                  </p>
+                )}
+                {recipe.cookingTime && (
+                  <div className="mt-3 inline-flex items-center gap-1.5 text-xs text-gray-400 font-medium">
+                    <Clock size={13} />
+                    {recipe.cookingTime} min
+                  </div>
+                )}
+              </Link>
 
-                <span className="opacity-0 group-hover:opacity-100 transition">
-                  →
-                </span>
+              <div className="px-5 py-3 border-t border-gray-100 bg-gray-50 flex items-center justify-between mt-auto">
+                <Link
+                  href={`/recipes/${recipe.id}`}
+                  className="text-xs font-medium text-gray-400 hover:text-gray-700 transition-colors"
+                >
+                  View recipe →
+                </Link>
+                <div className="flex items-center gap-1">
+                  <EditRecipeDialog recipe={recipe} />
+                  <DeleteButton
+                    id={recipe.id}
+                    action={deleteRecipe}
+                    size="sm"
+                  />
+                </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}
