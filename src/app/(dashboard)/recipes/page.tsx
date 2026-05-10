@@ -5,8 +5,11 @@ import { EditRecipeDialog } from '@/components/buttons/editRecipeDialog'
 import { DeleteButton } from '@/components/buttons/deleteButton'
 import { deleteRecipe } from '@/lib/actions/recipe.actions'
 import { Plus, Clock, ChefHat } from 'lucide-react'
+import { GenerateRecipeButton } from '@/components/buttons/generateRecipeButton'
+import { auth } from '@/auth'
 
 export default async function RecipesPage() {
+  const session = await auth()
   const recipes = await prisma.recipe.findMany({
     orderBy: { createdAt: 'desc' },
   })
@@ -86,6 +89,9 @@ export default async function RecipesPage() {
           ))}
         </div>
       )}
+      <div className="flex justify-center">
+        {session?.user && <GenerateRecipeButton />}
+      </div>
     </div>
   )
 }
