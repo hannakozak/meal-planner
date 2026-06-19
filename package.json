@@ -35,7 +35,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@prisma/client": "^7.3.0",
+    "@prisma/client": "^7.8.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.30",
     "@types/pg": "^8.16.0",
@@ -47,7 +47,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "prettier": "^3.8.0",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "prisma": "^7.3.0",
+    "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
