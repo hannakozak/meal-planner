@@ -150,6 +150,12 @@ export async function createRecipe(formData: FormData) {
 export async function deleteRecipe(formData: FormData) {
   const id = formData.get('id') as string
 
+  await prisma.recipeIngredient.deleteMany({ where: { recipeId: id } })
+  await prisma.recipeTranslation.deleteMany({ where: { recipeId: id } })
+  await prisma.recipeCategory.deleteMany({ where: { recipeId: id } })
+  await prisma.favorite.deleteMany({ where: { recipeId: id } })
+  await prisma.mealPlanRecipe.deleteMany({ where: { recipeId: id } })
+
   await prisma.recipe.delete({
     where: { id },
   })
