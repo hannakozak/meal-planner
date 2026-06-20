@@ -12,23 +12,58 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 export async function generateRecipe(ingredients: string) {
   const session = await auth()
 
-  if (!session?.user) {
+  if (!session?.user?.id) {
     throw new Error('Unauthorized')
   }
 
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
   const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
   const prompt = `
-Generate a recipe based on these ingredients: ${ingredients}.
+You are a practical recipe assistant for a meal-planning web app.
 
-Return ONLY a valid JSON object, no markdown, no backticks, just raw JSON:
+Create one realistic, useful recipe based mainly on these ingredients:
+${ingredients}
+
+Rules:
+- Use the provided ingredients as the main ingredients.
+- You may add a few basic pantry ingredients if needed, such as salt, pepper, oil, water, garlic, onion, lemon juice, herbs or spices.
+- Do not create unrealistic ingredient combinations.
+- Use clear, simple cooking instructions.
+- Use realistic quantities and units.
+- Use common units only: g, kg, ml, l, tbsp, tsp, pcs, cup.
+- For liquids use ml or l.
+- For dry ingredients use g or kg.
+- For eggs, bananas, apples, onions, garlic cloves and similar countable items use pcs.
+- Cooking time should be realistic.
+- Servings should be between 1 and 6.
+- Instructions should be practical and easy to follow.
+- Return 4 to 8 ingredients.
+- Return 3 to 8 instruction steps.
+
+Return ONLY a valid JSON object.
+No markdown.
+No backticks.
+No explanation.
+
+Use this exact structure:
 {
   "title": "Recipe name",
-  "description": "Short description",
+  "description": "Short appetising description",
   "cookingTime": 30,
   "servings": 4,
-  "instructions": ["Step 1...", "Step 2...", "Step 3..."]
+  "ingredients": [
+    {
+      "name": "ingredient name",
+      "quantity": 200,
+      "unit": "g",
+      "note": "optional note or null"
+    }
+  ],
+  "instructions": [
+    "Step 1...",
+    "Step 2...",
+    "Step 3..."
+  ]
 }
 `
 
@@ -48,9 +83,40 @@ Return ONLY a valid JSON object, no markdown, no backticks, just raw JSON:
           cookingTime: recipeData.cookingTime,
           servings: recipeData.servings,
           instructions: recipeData.instructions,
-          authorId: session.user.id!,
+          authorId: session.user.id,
+          ingredients: {
+            create: await Promise.all(
+              recipeData.ingredients.map(
+                async (item: {
+                  name: string
+                  quantity: number | null
+                  unit: string | null
+                  note: string | null
+                }) => {
+                  const ingredient = await prisma.ingredient.upsert({
+                    where: {
+                      name: item.name.trim().toLowerCase(),
+                    },
+                    update: {},
+                    create: {
+                      name: item.name.trim().toLowerCase(),
+                    },
+                  })
+
+                  return {
+                    quantity: item.quantity,
+                    unit: item.unit,
+                    note: item.note,
+                    ingredientId: ingredient.id,
+                  }
+                },
+              ),
+            ),
+          },
         },
       })
+
+      revalidatePath('/recipes')
 
       return recipe
     } catch (error: any) {
