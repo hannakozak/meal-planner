@@ -13,6 +13,13 @@ export default async function RecipePage({
 
   const recipe = await prisma.recipe.findUnique({
     where: { id },
+    include: {
+      ingredients: {
+        include: {
+          ingredient: true,
+        },
+      },
+    },
   })
 
   if (!recipe) return notFound()
@@ -47,6 +54,28 @@ export default async function RecipePage({
           </div>
         )}
       </div>
+
+      {recipe.ingredients.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Ingredients</h2>
+
+          <ul className="space-y-2">
+            {recipe.ingredients.map((item) => (
+              <li
+                key={item.id}
+                className="flex items-center justify-between rounded-lg border p-3"
+              >
+                <span className="font-medium">{item.ingredient.name}</span>
+
+                <span className="text-gray-500">
+                  {item.quantity} {item.unit}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {recipe.instructions && recipe.instructions.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Instructions</h2>

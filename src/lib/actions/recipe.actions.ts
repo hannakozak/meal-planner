@@ -82,7 +82,16 @@ export async function createRecipe(formData: FormData) {
 
   const title = formData.get('title') as string
   const description = formData.get('description') as string
-  const cookingTime = Number(formData.get('cookingTime'))
+  const cookingTimeValue = formData.get('cookingTime')
+  const servingsValue = formData.get('servings')
+  const ingredientNames = formData.getAll('ingredientName') as string[]
+  const ingredientQuantities = formData.getAll('ingredientQuantity') as string[]
+  const ingredientUnits = formData.getAll('ingredientUnit') as string[]
+  const ingredientNotes = formData.getAll('ingredientNote') as string[]
+  const instructions = formData
+    .getAll('instruction')
+    .map((step) => String(step).trim())
+    .filter(Boolean)
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
@@ -90,15 +99,51 @@ export async function createRecipe(formData: FormData) {
 
   if (!user) throw new Error('User not found')
 
+  const ingredients = ingredientNames
+    .map((name, index) => ({
+      name: name.trim().toLowerCase(),
+      quantity: ingredientQuantities[index]
+        ? Number(ingredientQuantities[index])
+        : null,
+      unit: ingredientUnits[index]?.trim() || null,
+      note: ingredientNotes[index]?.trim() || null,
+    }))
+    .filter((ingredient) => ingredient.name.length > 0)
+
+  const uniqueIngredients = Array.from(
+    new Map(ingredients.map((item) => [item.name, item])).values(),
+  )
+
   await prisma.recipe.create({
     data: {
       title,
       description,
-      cookingTime,
+      cookingTime: cookingTimeValue ? Number(cookingTimeValue) : null,
+      servings: servingsValue ? Number(servingsValue) : null,
+      instructions,
       authorId: user.id,
+      ingredients: {
+        create: await Promise.all(
+          uniqueIngredients.map(async (item) => {
+            const ingredient = await prisma.ingredient.upsert({
+              where: { name: item.name },
+              update: {},
+              create: { name: item.name },
+            })
+
+            return {
+              quantity: item.quantity,
+              note: item.note,
+              unit: item.unit,
+              ingredientId: ingredient.id,
+            }
+          }),
+        ),
+      },
     },
   })
 
+  revalidatePath('/recipes')
   redirect('/recipes')
 }
 
