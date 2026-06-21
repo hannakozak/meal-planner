@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { PrimaryActionButton } from '@/components/buttons/primaryActionButton'
-import { EditRecipeDialog } from '@/components/buttons/editRecipeDialog'
+import { EditRecipeDialog } from '@/components/editRecipeDialog'
 import { DeleteButton } from '@/components/buttons/deleteButton'
 import { deleteRecipe } from '@/lib/actions/recipe.actions'
 import { Plus, Clock, ChefHat } from 'lucide-react'

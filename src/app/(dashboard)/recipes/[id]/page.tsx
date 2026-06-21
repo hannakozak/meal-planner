@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import { deleteRecipe, updateRecipe } from '@/lib/actions/recipe.actions'
 import { DeleteButton } from '@/components/buttons/deleteButton'
-import { EditRecipeDialog } from '@/components/buttons/editRecipeDialog'
+import { EditRecipeDialog } from '@/components/editRecipeDialog'
 
 export default async function RecipePage({
   params,

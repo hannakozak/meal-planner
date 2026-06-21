@@ -235,6 +235,11 @@ export async function updateRecipe(id: string, formData: FormData) {
   const cookingTime = formData.get('cookingTime')
   const servings = formData.get('servings')
 
+  const instructions = String(formData.get('instructions') ?? '')
+    .split('\n')
+    .map((step) => step.trim())
+    .filter(Boolean)
+
   await prisma.recipe.update({
     where: { id },
     data: {
@@ -242,6 +247,7 @@ export async function updateRecipe(id: string, formData: FormData) {
       description,
       cookingTime: cookingTime ? Number(cookingTime) : null,
       servings: servings ? Number(servings) : null,
+      instructions,
     },
   })
 
