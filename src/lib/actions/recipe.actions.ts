@@ -148,6 +148,7 @@ export async function createRecipe(formData: FormData) {
 
   const title = formData.get('title') as string
   const description = formData.get('description') as string
+  const imageUrl = formData.get('imageUrl') as string
   const cookingTimeValue = formData.get('cookingTime')
   const servingsValue = formData.get('servings')
   const ingredientNames = formData.getAll('ingredientName') as string[]
@@ -184,6 +185,7 @@ export async function createRecipe(formData: FormData) {
     data: {
       title,
       description,
+      imageUrl: imageUrl?.trim() || null,
       cookingTime: cookingTimeValue ? Number(cookingTimeValue) : null,
       servings: servingsValue ? Number(servingsValue) : null,
       instructions,

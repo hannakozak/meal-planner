@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { deleteRecipe, updateRecipe } from '@/lib/actions/recipe.actions'
 import { DeleteButton } from '@/components/buttons/deleteButton'
 import { EditRecipeDialog } from '@/components/editRecipeDialog'
+import Image from 'next/image'
 
 export default async function RecipePage({
   params,
@@ -35,6 +36,16 @@ export default async function RecipePage({
           </p>
         )}
       </div>
+      {recipe.imageUrl && (
+        <div className="relative h-72 w-full overflow-hidden rounded-2xl">
+          <Image
+            src={recipe.imageUrl}
+            alt={recipe.title}
+            fill
+            className="object-cover"
+          />
+        </div>
+      )}
       <div className="flex items-center gap-1">
         <EditRecipeDialog recipe={recipe} />
         <DeleteButton id={recipe.id} action={deleteRecipe} size="sm" />

@@ -56,6 +56,18 @@ export function NewRecipeForm() {
             />
           </div>
 
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Image URL</label>
+            <input
+              name="imageUrl"
+              placeholder="https://example.com/recipe-image.jpg"
+              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-green-500"
+            />
+            <p className="text-xs text-gray-500">
+              Optional. Paste a link to an image of your recipe.
+            </p>
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium">Cooking time</label>
