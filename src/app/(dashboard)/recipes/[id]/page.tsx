@@ -28,24 +28,24 @@ export default async function RecipePage({
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div className="space-y-3">
-        <h1 className="text-3xl font-bold">{recipe.title}</h1>
-
+        <h1 className="text-3xl font-bold capitalize">{recipe.title}</h1>
+        {recipe.imageUrl && (
+          <div className="relative h-80 w-full overflow-hidden rounded-2xl">
+            <Image
+              src={recipe.imageUrl}
+              alt={recipe.title}
+              fill
+              className="object-cover"
+            />
+          </div>
+        )}
         {recipe.description && (
           <p className="text-gray-600 text-base leading-relaxed">
             {recipe.description}
           </p>
         )}
       </div>
-      {recipe.imageUrl && (
-        <div className="relative h-72 w-full overflow-hidden rounded-2xl">
-          <Image
-            src={recipe.imageUrl}
-            alt={recipe.title}
-            fill
-            className="object-cover"
-          />
-        </div>
-      )}
+
       <div className="flex items-center gap-1">
         <EditRecipeDialog recipe={recipe} />
         <DeleteButton id={recipe.id} action={deleteRecipe} size="sm" />

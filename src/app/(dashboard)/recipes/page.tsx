@@ -52,6 +52,13 @@ export default async function RecipesPage() {
               key={recipe.id}
               className="group flex flex-col bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
             >
+              {recipe.imageUrl && (
+                <img
+                  src={recipe.imageUrl}
+                  alt={recipe.title}
+                  className="h-44 w-full object-cover"
+                />
+              )}
               <Link href={`/recipes/${recipe.id}`} className="block p-5 flex-1">
                 <h2 className="text-base font-semibold text-gray-900 leading-snug truncate">
                   {recipe.title}

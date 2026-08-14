@@ -5,6 +5,7 @@ import { createRecipe } from '@/lib/actions/recipe.actions'
 import { IngredientRow } from './ingredient-row'
 import { InstructionField } from './instruction-field'
 import { Plus } from 'lucide-react'
+import { RecipeImageUpload } from '@/features/recipies/recipe-image-upload'
 
 export function NewRecipeForm() {
   const [ingredients, setIngredients] = useState([crypto.randomUUID()])
@@ -57,15 +58,7 @@ export function NewRecipeForm() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Image URL</label>
-            <input
-              name="imageUrl"
-              placeholder="https://example.com/recipe-image.jpg"
-              className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-green-500"
-            />
-            <p className="text-xs text-gray-500">
-              Optional. Paste a link to an image of your recipe.
-            </p>
+            <RecipeImageUpload />
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
