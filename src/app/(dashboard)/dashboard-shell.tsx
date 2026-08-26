@@ -28,7 +28,7 @@ export function DashboardShell({ children, userName }: DashboardShellProps) {
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/recipes', label: 'Recipes', icon: BookOpen },
-    { href: '/planner', label: 'Meal Planner', icon: CalendarDays },
+    { href: '/meal-planner', label: 'Meal Planner', icon: CalendarDays },
     { href: '/shopping-list', label: 'Shopping List', icon: ShoppingCart },
     { href: '/settings', label: 'Settings', icon: Settings },
   ]
