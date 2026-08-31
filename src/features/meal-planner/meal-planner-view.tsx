@@ -2,6 +2,7 @@ import { MealType, WeekDay } from '@prisma/client'
 import { MEAL_TYPES, WEEK_DAYS } from './constants'
 import { formatWeekDate } from './utils'
 import { WeekNavigation } from './week-navigation'
+import { AddRecipeDialog } from './add-recipe-dialog'
 
 type Meal = {
   day: WeekDay | null
@@ -11,16 +12,26 @@ type Meal = {
   }
 }
 
+type Recipe = {
+  id: string
+  title: string
+  imageUrl: string | null
+}
+
 type MealPlannerViewProps = {
+  mealPlanId: string
   monday: Date
   sunday: Date
   meals: Meal[]
+  recipes: Recipe[]
 }
 
 export function MealPlannerView({
+  mealPlanId,
   monday,
   sunday,
   meals,
+  recipes,
 }: MealPlannerViewProps) {
   return (
     <div className="space-y-8">
@@ -36,7 +47,7 @@ export function MealPlannerView({
 
       <WeekNavigation monday={monday} sunday={sunday} />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {WEEK_DAYS.map(({ key, label }, index) => {
           const date = new Date(monday)
           date.setDate(monday.getDate() + index)
@@ -63,23 +74,23 @@ export function MealPlannerView({
                   return (
                     <div
                       key={mealType}
-                      className="rounded-xl border border-dashed border-gray-300 p-3"
+                      className="min-h-[112px] rounded-xl border border-gray-200 bg-gray-50/50 p-3 transition-colors hover:border-gray-300"
                     >
-                      <p className="text-xs font-medium uppercase text-gray-400">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                         {mealType}
                       </p>
 
                       {meal ? (
-                        <p className="mt-2 text-sm font-medium text-gray-900">
+                        <p className="mt-3 line-clamp-3 text-sm font-semibold leading-5 text-gray-900">
                           {meal.recipe.title}
                         </p>
                       ) : (
-                        <button
-                          type="button"
-                          className="mt-2 text-sm text-gray-400 hover:text-gray-700"
-                        >
-                          + Add recipe
-                        </button>
+                        <AddRecipeDialog
+                          mealPlanId={mealPlanId}
+                          recipes={recipes}
+                          day={key}
+                          mealType={mealType}
+                        />
                       )}
                     </div>
                   )

@@ -73,7 +73,22 @@ export default async function MealPlannerPage({
     })
   }
 
+  const recipes = await prisma.recipe.findMany({
+    where: {
+      authorId: session.user.id,
+    },
+    orderBy: {
+      title: 'asc',
+    },
+  })
+
   return (
-    <MealPlannerView monday={monday} sunday={sunday} meals={mealPlan.meals} />
+    <MealPlannerView
+      mealPlanId={mealPlan.id}
+      monday={monday}
+      sunday={sunday}
+      meals={mealPlan.meals}
+      recipes={recipes}
+    />
   )
 }

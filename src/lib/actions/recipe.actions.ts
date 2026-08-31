@@ -83,7 +83,7 @@ Use this exact structure:
           cookingTime: recipeData.cookingTime,
           servings: recipeData.servings,
           instructions: recipeData.instructions,
-          authorId: session.user.id,
+          authorId: session.user.id!,
           ingredients: {
             create: await Promise.all(
               recipeData.ingredients.map(
