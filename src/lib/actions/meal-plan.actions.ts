@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { MealType, WeekDay } from '@prisma/client'
+import { revalidatePath } from 'next/cache'
 
 export async function getOrCreateMealPlan(weekStart: Date, weekEnd: Date) {
   const session = await auth()
@@ -99,7 +100,7 @@ export async function addRecipeToMealPlan({
     throw new Error('This meal slot is already occupied')
   }
 
-  return prisma.mealPlanRecipe.create({
+  const meal = await prisma.mealPlanRecipe.create({
     data: {
       mealPlanId,
       recipeId,
@@ -110,4 +111,36 @@ export async function addRecipeToMealPlan({
       recipe: true,
     },
   })
+
+  revalidatePath('/meal-planner')
+
+  return meal
+}
+
+export async function removeRecipeFromMealPlan(mealPlanRecipeId: string) {
+  const session = await auth()
+
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized')
+  }
+
+  const mealPlanRecipe = await prisma.mealPlanRecipe.findFirst({
+    where: {
+      id: mealPlanRecipeId,
+      mealPlan: {
+        userId: session.user.id,
+      },
+    },
+  })
+
+  if (!mealPlanRecipe) {
+    throw new Error('Meal not found')
+  }
+
+  await prisma.mealPlanRecipe.delete({
+    where: {
+      id: mealPlanRecipeId,
+    },
+  })
+  revalidatePath('/meal-planner')
 }

@@ -60,7 +60,6 @@ export function AddRecipeDialog({
 
       setOpen(false)
       setRecipeId('')
-      window.location.reload()
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Something went wrong.')
     } finally {
