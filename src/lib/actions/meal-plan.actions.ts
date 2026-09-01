@@ -144,3 +144,57 @@ export async function removeRecipeFromMealPlan(mealPlanRecipeId: string) {
   })
   revalidatePath('/meal-planner')
 }
+
+export async function updateMealPlanRecipe({
+  mealPlanRecipeId,
+  recipeId,
+}: {
+  mealPlanRecipeId: string
+  recipeId: string
+}) {
+  const session = await auth()
+
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized')
+  }
+
+  const mealPlanRecipe = await prisma.mealPlanRecipe.findFirst({
+    where: {
+      id: mealPlanRecipeId,
+      mealPlan: {
+        userId: session.user.id,
+      },
+    },
+  })
+
+  if (!mealPlanRecipe) {
+    throw new Error('Meal not found')
+  }
+
+  const recipe = await prisma.recipe.findFirst({
+    where: {
+      id: recipeId,
+      authorId: session.user.id,
+    },
+  })
+
+  if (!recipe) {
+    throw new Error('Recipe not found')
+  }
+
+  const updatedMeal = await prisma.mealPlanRecipe.update({
+    where: {
+      id: mealPlanRecipeId,
+    },
+    data: {
+      recipeId,
+    },
+    include: {
+      recipe: true,
+    },
+  })
+
+  revalidatePath('/meal-planner')
+
+  return updatedMeal
+}

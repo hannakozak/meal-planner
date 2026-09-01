@@ -4,12 +4,14 @@ import { formatWeekDate } from './utils'
 import { WeekNavigation } from './week-navigation'
 import { AddRecipeDialog } from './add-recipe-dialog'
 import { RemoveMealButton } from './remove-meal-button'
+import { EditMealDialog } from './edit-meal-dialog'
 
 type Meal = {
   id: string
   day: WeekDay | null
   mealType: MealType
   recipe: {
+    id: string
     title: string
   }
 }
@@ -88,7 +90,17 @@ export function MealPlannerView({
                             {meal.recipe.title}
                           </p>
 
-                          <RemoveMealButton mealPlanRecipeId={meal.id} />
+                          <div className="flex items-center gap-x-0.5">
+                            <EditMealDialog
+                              mealPlanRecipeId={meal.id}
+                              currentRecipeId={meal.recipe.id}
+                              recipes={recipes}
+                              day={key}
+                              mealType={mealType}
+                            />
+
+                            <RemoveMealButton mealPlanRecipeId={meal.id} />
+                          </div>
                         </div>
                       ) : (
                         <AddRecipeDialog
