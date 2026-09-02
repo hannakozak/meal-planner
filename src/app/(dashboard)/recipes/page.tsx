@@ -10,7 +10,14 @@ import { auth } from '@/auth'
 
 export default async function RecipesPage() {
   const session = await auth()
+
+  if (!session?.user?.id) {
+    return null
+  }
   const recipes = await prisma.recipe.findMany({
+    where: {
+      authorId: session?.user?.id,
+    },
     orderBy: { createdAt: 'desc' },
   })
 
