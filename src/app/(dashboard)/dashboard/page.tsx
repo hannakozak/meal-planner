@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/auth'
 import Link from 'next/link'
 import {
   Plus,
@@ -13,9 +14,21 @@ import {
 import { PrimaryActionButton } from '@/components/buttons/primaryActionButton'
 
 export default async function DashboardPage() {
+  const session = await auth()
+
+  if (!session?.user?.id) {
+    return null
+  }
   const [recipeCount, latestRecipes] = await Promise.all([
-    prisma.recipe.count(),
+    prisma.recipe.count({
+      where: {
+        authorId: session.user.id,
+      },
+    }),
     prisma.recipe.findMany({
+      where: {
+        authorId: session.user.id,
+      },
       orderBy: { createdAt: 'desc' },
       take: 4,
     }),
@@ -31,21 +44,21 @@ export default async function DashboardPage() {
     },
     {
       label: 'Weekly Plans',
-      value: 3,
+      value: 0,
       icon: Calendar,
       color: 'text-blue-600',
       bg: 'bg-blue-50',
     },
     {
       label: 'Shopping List',
-      value: 18,
+      value: 0,
       icon: ShoppingBag,
       color: 'text-orange-600',
       bg: 'bg-orange-50',
     },
     {
       label: 'Done this week',
-      value: 12,
+      value: 0,
       icon: CheckCircle2,
       color: 'text-purple-600',
       bg: 'bg-purple-50',
