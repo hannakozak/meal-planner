@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/auth'
 import { notFound } from 'next/navigation'
-import { deleteRecipe, updateRecipe } from '@/lib/actions/recipe.actions'
+import { deleteRecipe } from '@/lib/actions/recipe.actions'
 import { DeleteButton } from '@/components/buttons/deleteButton'
 import { EditRecipeDialog } from '@/components/editRecipeDialog'
 import Image from 'next/image'
@@ -11,9 +12,16 @@ export default async function RecipePage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+  const session = await auth()
 
-  const recipe = await prisma.recipe.findUnique({
-    where: { id },
+  if (!session?.user?.id) {
+    return notFound()
+  }
+  const recipe = await prisma.recipe.findFirst({
+    where: {
+      id,
+      authorId: session.user.id,
+    },
     include: {
       ingredients: {
         include: {
