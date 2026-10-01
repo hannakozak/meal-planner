@@ -216,7 +216,24 @@ export async function createRecipe(formData: FormData) {
 }
 
 export async function deleteRecipe(formData: FormData) {
+  const session = await auth()
+
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized')
+  }
+
   const id = formData.get('id') as string
+
+  const recipe = await prisma.recipe.findFirst({
+    where: {
+      id,
+      authorId: session.user.id,
+    },
+  })
+
+  if (!recipe) {
+    throw new Error('Recipe not found')
+  }
 
   await prisma.recipeIngredient.deleteMany({ where: { recipeId: id } })
   await prisma.recipeTranslation.deleteMany({ where: { recipeId: id } })
@@ -232,6 +249,23 @@ export async function deleteRecipe(formData: FormData) {
 }
 
 export async function updateRecipe(id: string, formData: FormData) {
+  const session = await auth()
+
+  if (!session?.user?.id) {
+    throw new Error('Unauthorized')
+  }
+
+  const recipe = await prisma.recipe.findFirst({
+    where: {
+      id,
+      authorId: session.user.id,
+    },
+  })
+
+  if (!recipe) {
+    throw new Error('Recipe not found')
+  }
+
   const title = formData.get('title') as string
   const description = formData.get('description') as string
   const cookingTime = formData.get('cookingTime')
