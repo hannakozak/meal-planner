@@ -48,16 +48,6 @@ export function RecipesSection() {
               personalised ideas.
             </p>
           </div>
-
-          <Link href="/recipes">
-            <Button
-              variant="outline"
-              className="rounded-full border-green-700 text-green-800 hover:bg-green-50"
-            >
-              Browse all recipes
-              <ArrowRight size={16} />
-            </Button>
-          </Link>
         </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-3">
