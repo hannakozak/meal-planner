@@ -166,3 +166,60 @@ export async function deleteUserRecipe(id: string) {
     }
   })
 }
+
+export async function getDashboardRecipes() {
+  const { userId } = await verifySession()
+
+  const [recipeCount, latestRecipes] = await Promise.all([
+    prisma.recipe.count({
+      where: { authorId: userId },
+    }),
+    prisma.recipe.findMany({
+      where: { authorId: userId },
+      select: {
+        id: true,
+        title: true,
+        cookingTime: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 4,
+    }),
+  ])
+
+  return {
+    recipeCount,
+    latestRecipes,
+  }
+}
+
+export async function getUserRecipeById(id: string) {
+  const { userId } = await verifySession()
+
+  return prisma.recipe.findFirst({
+    where: {
+      id,
+      authorId: userId,
+    },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      imageUrl: true,
+      cookingTime: true,
+      servings: true,
+      instructions: true,
+      ingredients: {
+        select: {
+          id: true,
+          quantity: true,
+          unit: true,
+          ingredient: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  })
+}

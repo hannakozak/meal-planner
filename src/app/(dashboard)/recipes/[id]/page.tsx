@@ -1,5 +1,4 @@
-import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
+import { getUserRecipeById } from '@/lib/dal/recipes'
 import { notFound } from 'next/navigation'
 import { deleteRecipe } from '@/lib/actions/recipe.actions'
 import { DeleteButton } from '@/components/buttons/deleteButton'
@@ -12,24 +11,7 @@ export default async function RecipePage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const session = await auth()
-
-  if (!session?.user?.id) {
-    return notFound()
-  }
-  const recipe = await prisma.recipe.findFirst({
-    where: {
-      id,
-      authorId: session.user.id,
-    },
-    include: {
-      ingredients: {
-        include: {
-          ingredient: true,
-        },
-      },
-    },
-  })
+  const recipe = await getUserRecipeById(id)
 
   if (!recipe) return notFound()
 

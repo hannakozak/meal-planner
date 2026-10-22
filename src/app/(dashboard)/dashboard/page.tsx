@@ -1,5 +1,4 @@
-import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
+import { getDashboardRecipes } from '@/lib/dal/recipes'
 import Link from 'next/link'
 import {
   Plus,
@@ -14,25 +13,7 @@ import {
 import { PrimaryActionButton } from '@/components/buttons/primaryActionButton'
 
 export default async function DashboardPage() {
-  const session = await auth()
-
-  if (!session?.user?.id) {
-    return null
-  }
-  const [recipeCount, latestRecipes] = await Promise.all([
-    prisma.recipe.count({
-      where: {
-        authorId: session.user.id,
-      },
-    }),
-    prisma.recipe.findMany({
-      where: {
-        authorId: session.user.id,
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 4,
-    }),
-  ])
+  const { recipeCount, latestRecipes } = await getDashboardRecipes()
 
   const stats = [
     {
