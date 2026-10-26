@@ -4,11 +4,10 @@ import { signIn, signOut } from '../../auth'
 import { hashSync } from 'bcrypt-ts-edge'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { formatError } from '@/lib/utils'
-import { prisma } from '@/lib/prisma'
 import { createUser } from '@/lib/dal/auth'
 
 export async function signInWithCredentials(
-  prevState: unknown,
+  prevState: { success: boolean; message: string },
   formData: FormData,
 ) {
   try {
@@ -16,7 +15,10 @@ export async function signInWithCredentials(
       email: formData.get('email'),
       password: formData.get('password'),
     })
-    await signIn('credentials', user)
+    await signIn('credentials', {
+      ...user,
+      redirectTo: '/dashboard',
+    })
     return { success: true, message: 'Signed in successfully' }
   } catch (error) {
     if (isRedirectError(error)) {
@@ -26,7 +28,10 @@ export async function signInWithCredentials(
   }
 }
 
-export async function signUpUser(prevState: unknown, formData: FormData) {
+export async function signUpUser(
+  prevState: { success: boolean; message: string },
+  formData: FormData,
+) {
   try {
     const user = signUpSchema.parse({
       name: formData.get('name'),
