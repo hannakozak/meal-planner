@@ -1,51 +1,12 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
+import {
+  addUserMeal,
+  removeUserMeal,
+  updateUserMeal,
+} from '@/lib/dal/meal-planner'
 import { MealType, WeekDay } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
-
-export async function getOrCreateMealPlan(weekStart: Date, weekEnd: Date) {
-  const session = await auth()
-
-  if (!session?.user?.id) {
-    throw new Error('Unauthorized')
-  }
-
-  const existingMealPlan = await prisma.mealPlan.findFirst({
-    where: {
-      userId: session.user.id,
-      weekStart,
-      weekEnd,
-    },
-    include: {
-      meals: {
-        include: {
-          recipe: true,
-        },
-      },
-    },
-  })
-
-  if (existingMealPlan) {
-    return existingMealPlan
-  }
-
-  return prisma.mealPlan.create({
-    data: {
-      userId: session.user.id,
-      weekStart,
-      weekEnd,
-    },
-    include: {
-      meals: {
-        include: {
-          recipe: true,
-        },
-      },
-    },
-  })
-}
 
 type AddRecipeToMealPlanInput = {
   mealPlanId: string
@@ -60,56 +21,11 @@ export async function addRecipeToMealPlan({
   day,
   mealType,
 }: AddRecipeToMealPlanInput) {
-  const session = await auth()
-
-  if (!session?.user?.id) {
-    throw new Error('Unauthorized')
-  }
-
-  const mealPlan = await prisma.mealPlan.findFirst({
-    where: {
-      id: mealPlanId,
-      userId: session.user.id,
-    },
-  })
-
-  if (!mealPlan) {
-    throw new Error('Meal plan not found')
-  }
-
-  const recipe = await prisma.recipe.findFirst({
-    where: {
-      id: recipeId,
-      authorId: session.user.id,
-    },
-  })
-
-  if (!recipe) {
-    throw new Error('Recipe not found')
-  }
-
-  const existingMeal = await prisma.mealPlanRecipe.findFirst({
-    where: {
-      mealPlanId,
-      day,
-      mealType,
-    },
-  })
-
-  if (existingMeal) {
-    throw new Error('This meal slot is already occupied')
-  }
-
-  const meal = await prisma.mealPlanRecipe.create({
-    data: {
-      mealPlanId,
-      recipeId,
-      day,
-      mealType,
-    },
-    include: {
-      recipe: true,
-    },
+  const meal = await addUserMeal({
+    mealPlanId,
+    recipeId,
+    day,
+    mealType,
   })
 
   revalidatePath('/meal-planner')
@@ -118,30 +34,8 @@ export async function addRecipeToMealPlan({
 }
 
 export async function removeRecipeFromMealPlan(mealPlanRecipeId: string) {
-  const session = await auth()
+  await removeUserMeal(mealPlanRecipeId)
 
-  if (!session?.user?.id) {
-    throw new Error('Unauthorized')
-  }
-
-  const mealPlanRecipe = await prisma.mealPlanRecipe.findFirst({
-    where: {
-      id: mealPlanRecipeId,
-      mealPlan: {
-        userId: session.user.id,
-      },
-    },
-  })
-
-  if (!mealPlanRecipe) {
-    throw new Error('Meal not found')
-  }
-
-  await prisma.mealPlanRecipe.delete({
-    where: {
-      id: mealPlanRecipeId,
-    },
-  })
   revalidatePath('/meal-planner')
 }
 
@@ -152,47 +46,7 @@ export async function updateMealPlanRecipe({
   mealPlanRecipeId: string
   recipeId: string
 }) {
-  const session = await auth()
-
-  if (!session?.user?.id) {
-    throw new Error('Unauthorized')
-  }
-
-  const mealPlanRecipe = await prisma.mealPlanRecipe.findFirst({
-    where: {
-      id: mealPlanRecipeId,
-      mealPlan: {
-        userId: session.user.id,
-      },
-    },
-  })
-
-  if (!mealPlanRecipe) {
-    throw new Error('Meal not found')
-  }
-
-  const recipe = await prisma.recipe.findFirst({
-    where: {
-      id: recipeId,
-      authorId: session.user.id,
-    },
-  })
-
-  if (!recipe) {
-    throw new Error('Recipe not found')
-  }
-
-  const updatedMeal = await prisma.mealPlanRecipe.update({
-    where: {
-      id: mealPlanRecipeId,
-    },
-    data: {
-      recipeId,
-    },
-    include: {
-      recipe: true,
-    },
-  })
+  const updatedMeal = await updateUserMeal(mealPlanRecipeId, recipeId)
 
   revalidatePath('/meal-planner')
 
