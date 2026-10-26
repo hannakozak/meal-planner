@@ -1,5 +1,4 @@
-import { prisma } from '@/lib/prisma'
-import { auth } from '@/auth'
+import { getMealPlannerData } from '@/lib/dal/meal-planner'
 import { MealPlannerView } from '@/features/meal-planner/meal-planner-view'
 import { getCurrentWeek, getWeekFromDate } from '@/features/meal-planner/utils'
 
@@ -12,12 +11,6 @@ type MealPlannerPageProps = {
 export default async function MealPlannerPage({
   searchParams,
 }: MealPlannerPageProps) {
-  const session = await auth()
-
-  if (!session?.user?.id) {
-    return null
-  }
-
   const params = await searchParams
 
   let monday: Date
@@ -41,45 +34,9 @@ export default async function MealPlannerPage({
     sunday = currentWeek.sunday
   }
 
-  let mealPlan = await prisma.mealPlan.findFirst({
-    where: {
-      userId: session.user.id,
-      weekStart: monday,
-      weekEnd: sunday,
-    },
-    include: {
-      meals: {
-        include: {
-          recipe: true,
-        },
-      },
-    },
-  })
-
-  if (!mealPlan) {
-    mealPlan = await prisma.mealPlan.create({
-      data: {
-        userId: session.user.id,
-        weekStart: monday,
-        weekEnd: sunday,
-      },
-      include: {
-        meals: {
-          include: {
-            recipe: true,
-          },
-        },
-      },
-    })
-  }
-
-  const recipes = await prisma.recipe.findMany({
-    where: {
-      authorId: session.user.id,
-    },
-    orderBy: {
-      title: 'asc',
-    },
+  const { mealPlan, recipes } = await getMealPlannerData({
+    monday,
+    sunday,
   })
 
   return (
