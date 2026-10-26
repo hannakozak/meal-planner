@@ -3,6 +3,7 @@ import 'server-only'
 import { auth } from '@/auth'
 import { cache } from 'react'
 import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/prisma'
 
 export const verifySession = cache(async () => {
   const session = await auth()
@@ -15,3 +16,26 @@ export const verifySession = cache(async () => {
     userId: session.user.id,
   }
 })
+
+export async function createUser({
+  name,
+  email,
+  password,
+}: {
+  name: string
+  email: string
+  password: string
+}) {
+  return prisma.user.create({
+    data: {
+      name,
+      email,
+      password,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+  })
+}

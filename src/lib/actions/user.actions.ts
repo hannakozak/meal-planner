@@ -2,18 +2,10 @@
 import { signInSchema, signUpSchema } from '@/lib/validators'
 import { signIn, signOut } from '../../auth'
 import { hashSync } from 'bcrypt-ts-edge'
-import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { formatError } from '@/lib/utils'
-
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-})
-
-const prisma = new PrismaClient({
-  adapter,
-})
+import { prisma } from '@/lib/prisma'
+import { createUser } from '@/lib/dal/auth'
 
 export async function signInWithCredentials(
   prevState: unknown,
@@ -46,17 +38,16 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
     const plainPassword = user.password
     user.password = hashSync(user.password, 10)
 
-    await prisma.user.create({
-      data: {
-        name: user.name,
-        email: user.email,
-        password: user.password,
-      },
+    await createUser({
+      name: user.name,
+      email: user.email,
+      password: user.password,
     })
 
     await signIn('credentials', {
       email: user.email,
       password: plainPassword,
+      redirectTo: '/dashboard',
     })
 
     return { success: true, message: 'User created and signed in successfully' }
