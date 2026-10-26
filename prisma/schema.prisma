@@ -253,6 +253,7 @@ model MealPlan {
   updatedAt DateTime @updatedAt @db.Timestamp(6)
 
   @@index([userId])
+  @@unique([userId, weekStart, weekEnd])
 }
 
 model MealPlanTranslation {
