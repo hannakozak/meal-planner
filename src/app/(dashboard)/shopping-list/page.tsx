@@ -1,6 +1,7 @@
 import { getUserShoppingLists } from '@/lib/dal/shopping-list'
 import { CreateShoppingListForm } from '@/features/shopping-list/create-shopping-list-form'
 import { DeleteShoppingListButton } from '@/features/shopping-list/delete-shopping-list-button'
+import Link from 'next/link'
 
 export default async function ShoppingListPage() {
   const shoppingLists = await getUserShoppingLists()
@@ -36,15 +37,17 @@ export default async function ShoppingListPage() {
           {shoppingLists.map((list) => (
             <div
               key={list.id}
-              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+              className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="font-semibold text-gray-900">{list.title}</h2>
+                <Link href={`/shopping-list/${list.id}`} className="flex-1">
+                  <h2 className="font-semibold text-gray-900 hover:text-green-700">
+                    {list.title}
+                  </h2>
                   <p className="mt-2 text-sm text-gray-500">
                     {list._count.items} items
                   </p>
-                </div>
+                </Link>
 
                 <DeleteShoppingListButton id={list.id} />
               </div>

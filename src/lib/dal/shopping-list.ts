@@ -56,3 +56,21 @@ export async function deleteUserShoppingList(id: string) {
     throw new Error('Shopping list not found')
   }
 }
+
+export async function getUserShoppingListById(id: string) {
+  const { userId } = await verifySession()
+
+  return prisma.shoppingList.findFirst({
+    where: {
+      id,
+      userId,
+    },
+    include: {
+      items: {
+        orderBy: {
+          createdAt: 'asc',
+        },
+      },
+    },
+  })
+}
