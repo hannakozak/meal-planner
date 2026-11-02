@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getUserShoppingListById } from '@/lib/dal/shopping-list'
+import { AddShoppingListItemForm } from '@/features/shopping-list/add-shopping-list-item-form'
 
 type ShoppingListPageProps = {
   params: Promise<{
@@ -26,7 +27,7 @@ export default async function ShoppingListPage({
         </h1>
         <p className="mt-1 text-sm text-gray-500">Manage your shopping list.</p>
       </div>
-
+      <AddShoppingListItemForm shoppingListId={shoppingList.id} />
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
         {shoppingList.items.length === 0 ? (
           <div className="py-8 text-center">

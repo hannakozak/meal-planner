@@ -3,6 +3,7 @@
 import {
   createUserShoppingList,
   deleteUserShoppingList,
+  createShoppingListItem,
 } from '@/lib/dal/shopping-list'
 import { revalidatePath } from 'next/cache'
 
@@ -24,4 +25,32 @@ export async function deleteShoppingList(id: string) {
   await deleteUserShoppingList(id)
 
   revalidatePath('/shopping-list')
+}
+export async function addShoppingListItem(input: {
+  shoppingListId: string
+  name: string
+  quantity?: number
+  unit?: string
+}) {
+  const name = input.name.trim()
+
+  if (!name) {
+    throw new Error('Item name is required')
+  }
+
+  if (
+    input.quantity !== undefined &&
+    (!Number.isFinite(input.quantity) || input.quantity <= 0)
+  ) {
+    throw new Error('Quantity must be greater than zero')
+  }
+
+  const item = await createShoppingListItem({
+    ...input,
+    name,
+  })
+
+  revalidatePath(`/shopping-list/${input.shoppingListId}`)
+
+  return item
 }

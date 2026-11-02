@@ -74,3 +74,41 @@ export async function getUserShoppingListById(id: string) {
     },
   })
 }
+type CreateShoppingListItemInput = {
+  shoppingListId: string
+  name: string
+  quantity?: number
+  unit?: string
+}
+
+export async function createShoppingListItem({
+  shoppingListId,
+  name,
+  quantity,
+  unit,
+}: CreateShoppingListItemInput) {
+  const { userId } = await verifySession()
+
+  const shoppingList = await prisma.shoppingList.findFirst({
+    where: {
+      id: shoppingListId,
+      userId,
+    },
+    select: {
+      id: true,
+    },
+  })
+
+  if (!shoppingList) {
+    throw new Error('Shopping list not found')
+  }
+
+  return prisma.shoppingListItem.create({
+    data: {
+      name: name.trim(),
+      quantity,
+      unit: unit?.trim() || null,
+      shoppingListId: shoppingList.id,
+    },
+  })
+}
