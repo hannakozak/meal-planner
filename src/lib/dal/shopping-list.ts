@@ -141,3 +141,31 @@ export async function toggleShoppingListItem(id: string) {
     },
   })
 }
+export async function deleteShoppingListItem(id: string) {
+  const { userId } = await verifySession()
+
+  const item = await prisma.shoppingListItem.findFirst({
+    where: {
+      id,
+      shoppingList: {
+        userId,
+      },
+    },
+    select: {
+      id: true,
+      shoppingListId: true,
+    },
+  })
+
+  if (!item) {
+    throw new Error('Shopping list item not found')
+  }
+
+  await prisma.shoppingListItem.delete({
+    where: {
+      id: item.id,
+    },
+  })
+
+  return item.shoppingListId
+}
