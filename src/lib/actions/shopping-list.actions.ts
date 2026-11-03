@@ -4,6 +4,7 @@ import {
   createUserShoppingList,
   deleteUserShoppingList,
   createShoppingListItem,
+  toggleShoppingListItem,
 } from '@/lib/dal/shopping-list'
 import { revalidatePath } from 'next/cache'
 
@@ -53,4 +54,9 @@ export async function addShoppingListItem(input: {
   revalidatePath(`/shopping-list/${input.shoppingListId}`)
 
   return item
+}
+export async function toggleShoppingItem(id: string, shoppingListId: string) {
+  await toggleShoppingListItem(id)
+
+  revalidatePath(`/shopping-list/${shoppingListId}`)
 }

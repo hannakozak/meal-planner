@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getUserShoppingListById } from '@/lib/dal/shopping-list'
 import { AddShoppingListItemForm } from '@/features/shopping-list/add-shopping-list-item-form'
+import { ShoppingListItem } from '@/features/shopping-list/shopping-list-item'
 
 type ShoppingListPageProps = {
   params: Promise<{
@@ -39,19 +40,11 @@ export default async function ShoppingListPage({
         ) : (
           <div className="space-y-3">
             {shoppingList.items.map((item) => (
-              <div
+              <ShoppingListItem
                 key={item.id}
-                className="flex items-center justify-between border-b border-gray-100 py-3"
-              >
-                <span className="text-sm font-medium text-gray-800">
-                  {item.name}
-                </span>
-                {item.quantity && (
-                  <span className="text-sm text-gray-500">
-                    {item.quantity} {item.unit}
-                  </span>
-                )}
-              </div>
+                item={item}
+                shoppingListId={shoppingList.id}
+              />
             ))}
           </div>
         )}

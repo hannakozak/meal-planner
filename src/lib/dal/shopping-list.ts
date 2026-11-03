@@ -112,3 +112,32 @@ export async function createShoppingListItem({
     },
   })
 }
+export async function toggleShoppingListItem(id: string) {
+  const { userId } = await verifySession()
+
+  const item = await prisma.shoppingListItem.findFirst({
+    where: {
+      id,
+      shoppingList: {
+        userId,
+      },
+    },
+    select: {
+      id: true,
+      isPurchased: true,
+    },
+  })
+
+  if (!item) {
+    throw new Error('Shopping list item not found')
+  }
+
+  return prisma.shoppingListItem.update({
+    where: {
+      id: item.id,
+    },
+    data: {
+      isPurchased: !item.isPurchased,
+    },
+  })
+}
