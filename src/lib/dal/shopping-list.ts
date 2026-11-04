@@ -169,3 +169,45 @@ export async function deleteShoppingListItem(id: string) {
 
   return item.shoppingListId
 }
+type UpdateShoppingListItemInput = {
+  id: string
+  name: string
+  quantity?: number
+  unit?: string
+}
+
+export async function updateShoppingListItem({
+  id,
+  name,
+  quantity,
+  unit,
+}: UpdateShoppingListItemInput) {
+  const { userId } = await verifySession()
+
+  const item = await prisma.shoppingListItem.findFirst({
+    where: {
+      id,
+      shoppingList: {
+        userId,
+      },
+    },
+    select: {
+      id: true,
+    },
+  })
+
+  if (!item) {
+    throw new Error('Shopping list item not found')
+  }
+
+  return prisma.shoppingListItem.update({
+    where: {
+      id: item.id,
+    },
+    data: {
+      name: name.trim(),
+      quantity,
+      unit: unit?.trim() || null,
+    },
+  })
+}

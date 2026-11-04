@@ -10,6 +10,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { EditShoppingListItemDialog } from '@/features/shopping-list/edit-shopping-list-item-dialog'
 import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toggleShoppingItem } from '@/lib/actions/shopping-list.actions'
@@ -84,7 +85,10 @@ export function ShoppingListItem({
             {item.quantity} {item.unit}
           </span>
         )}
-
+        <EditShoppingListItemDialog
+          item={item}
+          shoppingListId={shoppingListId}
+        />
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <button
