@@ -31,6 +31,12 @@ export default async function ShoppingListPage({
   const progress =
     totalItems > 0 ? Math.round((purchasedItems / totalItems) * 100) : 0
 
+  const itemsToBuy = shoppingList.items.filter((item) => !item.isPurchased)
+
+  const purchasedListItems = shoppingList.items.filter(
+    (item) => item.isPurchased,
+  )
+
   return (
     <div className="space-y-8">
       <div>
@@ -65,23 +71,55 @@ export default async function ShoppingListPage({
           {remainingItems} {remainingItems === 1 ? 'item' : 'items'} remaining
         </p>
       </div>
-      <div className="rounded-2xl border border-gray-200 bg-white p-6">
-        {shoppingList.items.length === 0 ? (
+      <div className="rounded-2xl border border-gray-200 bg-white p-6 space-y-6">
+        {itemsToBuy.length > 0 && (
+          <section>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-semibold text-gray-900">To buy</h2>
+              <span className="text-sm text-gray-500">
+                {itemsToBuy.length} items
+              </span>
+            </div>
+
+            <div>
+              {itemsToBuy.map((item) => (
+                <ShoppingListItem
+                  key={item.id}
+                  item={item}
+                  shoppingListId={shoppingList.id}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {purchasedListItems.length > 0 && (
+          <section>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="font-semibold text-gray-900">Purchased</h2>
+              <span className="text-sm text-gray-500">
+                {purchasedListItems.length} items
+              </span>
+            </div>
+
+            <div>
+              {purchasedListItems.map((item) => (
+                <ShoppingListItem
+                  key={item.id}
+                  item={item}
+                  shoppingListId={shoppingList.id}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {totalItems === 0 && (
           <div className="py-8 text-center">
             <h2 className="font-semibold text-gray-900">Your list is empty</h2>
             <p className="mt-2 text-sm text-gray-500">
               Start by adding your first item.
             </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {shoppingList.items.map((item) => (
-              <ShoppingListItem
-                key={item.id}
-                item={item}
-                shoppingListId={shoppingList.id}
-              />
-            ))}
           </div>
         )}
       </div>
