@@ -4,6 +4,8 @@ import { deleteRecipe } from '@/lib/actions/recipe.actions'
 import { DeleteButton } from '@/components/buttons/deleteButton'
 import { EditRecipeDialog } from '@/components/editRecipeDialog'
 import Image from 'next/image'
+import { AddRecipeToShoppingList } from '@/features/shopping-list/add-recipe-to-shopping-list'
+import { getUserShoppingLists } from '@/lib/dal/shopping-list'
 
 export default async function RecipePage({
   params,
@@ -14,7 +16,7 @@ export default async function RecipePage({
   const recipe = await getUserRecipeById(id)
 
   if (!recipe) return notFound()
-
+  const shoppingLists = await getUserShoppingLists()
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       <div className="space-y-3">
@@ -36,9 +38,13 @@ export default async function RecipePage({
         )}
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <EditRecipeDialog recipe={recipe} />
         <DeleteButton id={recipe.id} action={deleteRecipe} size="sm" />
+        <AddRecipeToShoppingList
+          shoppingLists={shoppingLists}
+          recipeId={recipe.id}
+        />
       </div>
       <div className="flex gap-6 text-sm text-gray-500">
         {recipe.cookingTime && (

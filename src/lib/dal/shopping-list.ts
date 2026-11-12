@@ -211,3 +211,137 @@ export async function updateShoppingListItem({
     },
   })
 }
+
+type AddRecipeIngredientsInput = {
+  recipeId: string
+  shoppingListId: string
+}
+
+function normalizeUnit(unit: string | null | undefined) {
+  const value = unit?.trim().toLowerCase()
+
+  if (!value) return null
+
+  const units: Record<string, { group: string; factor: number }> = {
+    g: { group: 'weight', factor: 1 },
+    gram: { group: 'weight', factor: 1 },
+    grams: { group: 'weight', factor: 1 },
+    kg: { group: 'weight', factor: 1000 },
+    kilogram: { group: 'weight', factor: 1000 },
+    kilograms: { group: 'weight', factor: 1000 },
+
+    ml: { group: 'volume', factor: 1 },
+    millilitre: { group: 'volume', factor: 1 },
+    millilitres: { group: 'volume', factor: 1 },
+    milliliter: { group: 'volume', factor: 1 },
+    milliliters: { group: 'volume', factor: 1 },
+    l: { group: 'volume', factor: 1000 },
+    litre: { group: 'volume', factor: 1000 },
+    litres: { group: 'volume', factor: 1000 },
+    liter: { group: 'volume', factor: 1000 },
+    liters: { group: 'volume', factor: 1000 },
+
+    pc: { group: 'count', factor: 1 },
+    pcs: { group: 'count', factor: 1 },
+    piece: { group: 'count', factor: 1 },
+    pieces: { group: 'count', factor: 1 },
+  }
+
+  const normalized = units[value]
+
+  return normalized
+    ? { ...normalized, original: value }
+    : { group: value, factor: 1, original: value }
+}
+
+export async function addRecipeIngredientsToShoppingList({
+  recipeId,
+  shoppingListId,
+}: AddRecipeIngredientsInput) {
+  const { userId } = await verifySession()
+
+  const [shoppingList, recipe] = await Promise.all([
+    prisma.shoppingList.findFirst({
+      where: {
+        id: shoppingListId,
+        userId,
+      },
+      select: { id: true },
+    }),
+    prisma.recipe.findFirst({
+      where: {
+        id: recipeId,
+        authorId: userId,
+      },
+      include: {
+        ingredients: {
+          include: {
+            ingredient: {
+              select: { name: true },
+            },
+          },
+        },
+      },
+    }),
+  ])
+
+  if (!shoppingList) throw new Error('Shopping list not found')
+  if (!recipe) throw new Error('Recipe not found')
+  if (recipe.ingredients.length === 0) {
+    throw new Error('Recipe has no ingredients')
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const existingItems = await tx.shoppingListItem.findMany({
+      where: { shoppingListId: shoppingList.id },
+    })
+
+    for (const ingredient of recipe.ingredients) {
+      const name = ingredient.ingredient.name.trim()
+      const incomingUnit = normalizeUnit(ingredient.unit)
+
+      const existingItem = existingItems.find((item) => {
+        const existingUnit = normalizeUnit(item.unit)
+
+        return (
+          item.name.trim().toLowerCase() === name.toLowerCase() &&
+          existingUnit?.group === incomingUnit?.group
+        )
+      })
+
+      if (existingItem) {
+        const existingUnit = normalizeUnit(existingItem.unit)
+
+        let quantity = existingItem.quantity
+
+        if (ingredient.quantity !== null && incomingUnit && existingUnit) {
+          const convertedQuantity =
+            (ingredient.quantity * incomingUnit.factor) / existingUnit.factor
+
+          quantity = (existingItem.quantity ?? 0) + convertedQuantity
+        }
+        await tx.shoppingListItem.update({
+          where: { id: existingItem.id },
+          data: {
+            quantity,
+            isPurchased: false,
+          },
+        })
+
+        existingItem.quantity = quantity
+        existingItem.isPurchased = false
+      } else {
+        const newItem = await tx.shoppingListItem.create({
+          data: {
+            name,
+            quantity: ingredient.quantity,
+            unit: ingredient.unit,
+            shoppingListId: shoppingList.id,
+          },
+        })
+
+        existingItems.push(newItem)
+      }
+    }
+  })
+}

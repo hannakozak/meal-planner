@@ -80,8 +80,8 @@ export function ShoppingListItem({
         </span>
       </label>
       <div className="flex shrink-0 items-center gap-3">
-        {item.quantity != null && (
-          <span className="text-sm text-gray-500">
+        {item.quantity !== null && (
+          <span className="text-sm text-muted-foreground">
             {item.quantity} {item.unit}
           </span>
         )}
