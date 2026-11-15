@@ -2,14 +2,13 @@ import 'server-only'
 
 import { prisma } from '@/lib/prisma'
 import { verifySession } from '@/lib/dal/auth'
+import type { Prisma } from '@prisma/client'
 
 export async function getUserShoppingLists() {
   const { userId } = await verifySession()
 
   return prisma.shoppingList.findMany({
-    where: {
-      userId,
-    },
+    where: { userId },
     select: {
       id: true,
       title: true,
@@ -74,6 +73,7 @@ export async function getUserShoppingListById(id: string) {
     },
   })
 }
+
 type CreateShoppingListItemInput = {
   shoppingListId: string
   name: string
@@ -112,6 +112,7 @@ export async function createShoppingListItem({
     },
   })
 }
+
 export async function toggleShoppingListItem(id: string) {
   const { userId } = await verifySession()
 
@@ -141,6 +142,7 @@ export async function toggleShoppingListItem(id: string) {
     },
   })
 }
+
 export async function deleteShoppingListItem(id: string) {
   const { userId } = await verifySession()
 
@@ -169,6 +171,7 @@ export async function deleteShoppingListItem(id: string) {
 
   return item.shoppingListId
 }
+
 type UpdateShoppingListItemInput = {
   id: string
   name: string
@@ -254,6 +257,70 @@ function normalizeUnit(unit: string | null | undefined) {
     : { group: value, factor: 1, original: value }
 }
 
+type ShoppingIngredientInput = {
+  name: string
+  quantity: number | null
+  unit: string | null
+}
+
+async function mergeShoppingListIngredients(
+  tx: Prisma.TransactionClient,
+  shoppingListId: string,
+  ingredients: ShoppingIngredientInput[],
+) {
+  const existingItems = await tx.shoppingListItem.findMany({
+    where: { shoppingListId },
+  })
+
+  for (const ingredient of ingredients) {
+    const name = ingredient.name.trim()
+    const incomingUnit = normalizeUnit(ingredient.unit)
+
+    const existingItem = existingItems.find((item) => {
+      const existingUnit = normalizeUnit(item.unit)
+
+      return (
+        item.name.trim().toLowerCase() === name.toLowerCase() &&
+        existingUnit?.group === incomingUnit?.group
+      )
+    })
+
+    if (existingItem) {
+      const existingUnit = normalizeUnit(existingItem.unit)
+      let quantity = existingItem.quantity
+
+      if (ingredient.quantity !== null && incomingUnit && existingUnit) {
+        const convertedQuantity =
+          (ingredient.quantity * incomingUnit.factor) / existingUnit.factor
+
+        quantity = (existingItem.quantity ?? 0) + convertedQuantity
+      }
+
+      await tx.shoppingListItem.update({
+        where: { id: existingItem.id },
+        data: {
+          quantity,
+          isPurchased: false,
+        },
+      })
+
+      existingItem.quantity = quantity
+      existingItem.isPurchased = false
+    } else {
+      const newItem = await tx.shoppingListItem.create({
+        data: {
+          name,
+          quantity: ingredient.quantity,
+          unit: ingredient.unit,
+          shoppingListId,
+        },
+      })
+
+      existingItems.push(newItem)
+    }
+  }
+}
+
 export async function addRecipeIngredientsToShoppingList({
   recipeId,
   shoppingListId,
@@ -287,61 +354,112 @@ export async function addRecipeIngredientsToShoppingList({
 
   if (!shoppingList) throw new Error('Shopping list not found')
   if (!recipe) throw new Error('Recipe not found')
+
   if (recipe.ingredients.length === 0) {
     throw new Error('Recipe has no ingredients')
   }
 
+  const ingredients = recipe.ingredients.map((item) => ({
+    name: item.ingredient.name,
+    quantity: item.quantity,
+    unit: item.unit,
+  }))
+
+  return prisma.$transaction((tx) =>
+    mergeShoppingListIngredients(tx, shoppingList.id, ingredients),
+  )
+}
+
+type AddMealPlanIngredientsInput = {
+  mealPlanId: string
+  shoppingListId: string
+}
+
+export async function addMealPlanIngredientsToShoppingList({
+  mealPlanId,
+  shoppingListId,
+}: AddMealPlanIngredientsInput) {
+  const { userId } = await verifySession()
+
+  const [shoppingList, mealPlan] = await Promise.all([
+    prisma.shoppingList.findFirst({
+      where: {
+        id: shoppingListId,
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    }),
+    prisma.mealPlan.findFirst({
+      where: {
+        id: mealPlanId,
+        userId,
+      },
+      select: {
+        id: true,
+        meals: {
+          include: {
+            recipe: {
+              include: {
+                ingredients: {
+                  include: {
+                    ingredient: {
+                      select: {
+                        name: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    }),
+  ])
+
+  if (!shoppingList) {
+    throw new Error('Shopping list not found')
+  }
+
+  if (!mealPlan) {
+    throw new Error('Meal plan not found')
+  }
+
+  const ingredients = mealPlan.meals.flatMap((meal) =>
+    meal.recipe.ingredients.map((item) => ({
+      name: item.ingredient.name,
+      quantity: item.quantity,
+      unit: item.unit,
+    })),
+  )
+
+  if (ingredients.length === 0) {
+    throw new Error('Meal plan has no ingredients')
+  }
+
   return prisma.$transaction(async (tx) => {
-    const existingItems = await tx.shoppingListItem.findMany({
-      where: { shoppingListId: shoppingList.id },
+    const existingGeneration = await tx.shoppingListGeneration.findUnique({
+      where: {
+        mealPlanId_shoppingListId: {
+          mealPlanId,
+          shoppingListId,
+        },
+      },
     })
 
-    for (const ingredient of recipe.ingredients) {
-      const name = ingredient.ingredient.name.trim()
-      const incomingUnit = normalizeUnit(ingredient.unit)
-
-      const existingItem = existingItems.find((item) => {
-        const existingUnit = normalizeUnit(item.unit)
-
-        return (
-          item.name.trim().toLowerCase() === name.toLowerCase() &&
-          existingUnit?.group === incomingUnit?.group
-        )
-      })
-
-      if (existingItem) {
-        const existingUnit = normalizeUnit(existingItem.unit)
-
-        let quantity = existingItem.quantity
-
-        if (ingredient.quantity !== null && incomingUnit && existingUnit) {
-          const convertedQuantity =
-            (ingredient.quantity * incomingUnit.factor) / existingUnit.factor
-
-          quantity = (existingItem.quantity ?? 0) + convertedQuantity
-        }
-        await tx.shoppingListItem.update({
-          where: { id: existingItem.id },
-          data: {
-            quantity,
-            isPurchased: false,
-          },
-        })
-
-        existingItem.quantity = quantity
-        existingItem.isPurchased = false
-      } else {
-        const newItem = await tx.shoppingListItem.create({
-          data: {
-            name,
-            quantity: ingredient.quantity,
-            unit: ingredient.unit,
-            shoppingListId: shoppingList.id,
-          },
-        })
-
-        existingItems.push(newItem)
-      }
+    if (existingGeneration) {
+      throw new Error('Shopping list has already been generated for this week')
     }
+
+    await tx.shoppingListGeneration.create({
+      data: {
+        mealPlanId,
+        shoppingListId,
+      },
+    })
+
+    await mergeShoppingListIngredients(tx, shoppingList.id, ingredients)
   })
 }

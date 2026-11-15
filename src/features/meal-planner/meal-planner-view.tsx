@@ -5,6 +5,7 @@ import { WeekNavigation } from './week-navigation'
 import { AddRecipeDialog } from './add-recipe-dialog'
 import { RemoveMealButton } from './remove-meal-button'
 import { EditMealDialog } from './edit-meal-dialog'
+import { GenerateShoppingListDialog } from './generate-shopping-list-dialog'
 
 type Meal = {
   id: string
@@ -22,12 +23,18 @@ type Recipe = {
   imageUrl: string | null
 }
 
+type ShoppingList = {
+  id: string
+  title: string
+}
+
 type MealPlannerViewProps = {
   mealPlanId: string
   monday: Date
   sunday: Date
   meals: Meal[]
   recipes: Recipe[]
+  shoppingLists: ShoppingList[]
 }
 
 export function MealPlannerView({
@@ -36,6 +43,7 @@ export function MealPlannerView({
   sunday,
   meals,
   recipes,
+  shoppingLists,
 }: MealPlannerViewProps) {
   return (
     <div className="space-y-8">
@@ -49,7 +57,14 @@ export function MealPlannerView({
         </p>
       </div>
 
-      <WeekNavigation monday={monday} sunday={sunday} />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <WeekNavigation monday={monday} sunday={sunday} />
+
+        <GenerateShoppingListDialog
+          shoppingLists={shoppingLists}
+          mealPlanId={mealPlanId}
+        />
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {WEEK_DAYS.map(({ key, label }, index) => {

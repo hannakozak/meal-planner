@@ -204,3 +204,46 @@ export async function updateUserMeal(
     },
   })
 }
+
+export async function getMealPlanIngredients(mealPlanId: string) {
+  const { userId } = await verifySession()
+
+  const mealPlan = await prisma.mealPlan.findFirst({
+    where: {
+      id: mealPlanId,
+      userId,
+    },
+    select: {
+      id: true,
+      meals: {
+        include: {
+          recipe: {
+            include: {
+              ingredients: {
+                include: {
+                  ingredient: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+  if (!mealPlan) {
+    throw new Error('Meal plan not found')
+  }
+
+  return mealPlan.meals.flatMap((meal) =>
+    meal.recipe.ingredients.map((item) => ({
+      name: item.ingredient.name,
+      quantity: item.quantity,
+      unit: item.unit,
+    })),
+  )
+}

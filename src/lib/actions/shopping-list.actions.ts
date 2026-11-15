@@ -9,7 +9,10 @@ import {
   updateShoppingListItem,
 } from '@/lib/dal/shopping-list'
 import { revalidatePath } from 'next/cache'
-import { addRecipeIngredientsToShoppingList } from '@/lib/dal/shopping-list'
+import {
+  addRecipeIngredientsToShoppingList,
+  addMealPlanIngredientsToShoppingList,
+} from '@/lib/dal/shopping-list'
 
 export async function createShoppingList(title: string) {
   const trimmedTitle = title.trim()
@@ -111,5 +114,22 @@ export async function addRecipeToShoppingList(
   return {
     success: true,
     message: 'Ingredients added to shopping list',
+  }
+}
+
+export async function addMealPlanToShoppingList(
+  mealPlanId: string,
+  shoppingListId: string,
+) {
+  await addMealPlanIngredientsToShoppingList({
+    mealPlanId,
+    shoppingListId,
+  })
+
+  revalidatePath(`/shopping-list/${shoppingListId}`)
+
+  return {
+    success: true,
+    message: 'Meal plan ingredients added to shopping list',
   }
 }

@@ -247,6 +247,7 @@ model MealPlan {
   weekEnd   DateTime @db.Date
 
   meals        MealPlanRecipe[]
+  shoppingListGenerations ShoppingListGeneration[]
   translations MealPlanTranslation[]
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
@@ -294,6 +295,7 @@ model ShoppingList {
 
   title        String
   items        ShoppingListItem[]
+  generations ShoppingListGeneration[]
   recipe       Recipe?                   @relation(fields: [recipeId], references: [id])
   recipeId     String?                   @db.Uuid
   translations ShoppingListTranslation[]
@@ -344,4 +346,20 @@ model ShoppingListItemTranslation {
   shoppingListItemId String           @db.Uuid
 
   @@unique([shoppingListItemId, locale])
+}
+
+
+model ShoppingListGeneration {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  mealPlanId String @db.Uuid
+  shoppingListId String @db.Uuid
+
+  mealPlan MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  shoppingList ShoppingList @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
+
+  generatedAt DateTime @default(now()) @db.Timestamp(6)
+
+  @@unique([mealPlanId, shoppingListId])
+  @@index([shoppingListId])
 }

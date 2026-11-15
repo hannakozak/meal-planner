@@ -1,6 +1,7 @@
 import { getMealPlannerData } from '@/lib/dal/meal-planner'
 import { MealPlannerView } from '@/features/meal-planner/meal-planner-view'
 import { getCurrentWeek, getWeekFromDate } from '@/features/meal-planner/utils'
+import { getUserShoppingLists } from '@/lib/dal/shopping-list'
 
 type MealPlannerPageProps = {
   searchParams: Promise<{
@@ -38,7 +39,7 @@ export default async function MealPlannerPage({
     monday,
     sunday,
   })
-
+  const shoppingLists = await getUserShoppingLists()
   return (
     <MealPlannerView
       mealPlanId={mealPlan.id}
@@ -46,6 +47,7 @@ export default async function MealPlannerPage({
       sunday={sunday}
       meals={mealPlan.meals}
       recipes={recipes}
+      shoppingLists={shoppingLists}
     />
   )
 }
